@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Reflection, Message } from '../types';
-import { Chat, GenerateContentResponse } from '@google/genai';
+import { requestChatReply } from '../services/geminiService';
 
 interface SimulationScreenProps {
   reflection: Reflection;
-  chat: Chat;
   onEndSimulation: (conversation: Message[]) => void;
 }
 
-const SimulationScreen: React.FC<SimulationScreenProps> = ({ reflection, chat, onEndSimulation }) => {
+const SimulationScreen: React.FC<SimulationScreenProps> = ({ reflection, onEndSimulation }) => {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +41,8 @@ const SimulationScreen: React.FC<SimulationScreenProps> = ({ reflection, chat, o
     setIsLoading(true);
 
     try {
-      const response: GenerateContentResponse = await chat.sendMessage({ message: userMessage.text });
-      const aiMessage: Message = { sender: 'ai', text: response.text };
+      const aiReply = await requestChatReply(reflection, conversation, userMessage.text);
+      const aiMessage: Message = { sender: 'ai', text: aiReply };
       setConversation(prev => {
         const newConversation = [...prev, aiMessage];
         const newUserTurns = newConversation.filter(msg => msg.sender === 'user').length;
@@ -71,10 +70,14 @@ const SimulationScreen: React.FC<SimulationScreenProps> = ({ reflection, chat, o
       <div className="text-center mb-4 border-b pb-4">
         <h2 className="text-2xl font-bold text-slate-800">대화 시뮬레이션</h2>
         <p className="text-slate-500">
-          <span className="font-semibold text-violet-600">{reflection.personaName}</span>
-          와(과)의 대화
+          지금은 <span className="font-semibold text-violet-600">{reflection.personaName}</span>의 시선으로 대화 중입니다.
         </p>
-         <p className="text-sm text-slate-500 mt-1">남은 턴: <span className="font-bold text-violet-600">{turnsLeft > 0 ? turnsLeft : 0}</span></p>
+        <p className="text-xs text-slate-400 mt-1">
+          말투: {reflection.personaTone} · 성격: {reflection.personaPersonality}
+        </p>
+        <p className="text-sm text-slate-500 mt-2">
+          남은 턴: <span className="font-bold text-violet-600">{turnsLeft > 0 ? turnsLeft : 0}</span>
+        </p>
       </div>
       
       <div className="flex-1 overflow-y-auto pr-4 -mr-4 mb-4">

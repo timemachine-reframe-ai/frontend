@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Screen, Reflection, AppState, Situation, Message, Report, User } from './types';
+import { Screen, Reflection, AppState, Situation, Message, User } from './types';
 import HomeScreen from './screens/HomeScreen';
 import SituationInputScreen from './screens/SituationInputScreen';
 import SimulationScreen from './screens/SimulationScreen';
 import ReportScreen from './screens/ReportScreen';
 import DiaryScreen from './screens/DiaryScreen';
 import AuthScreen from './screens/AuthScreen';
-import { generateReport, startChatSession } from './services/geminiService';
+import { generateReport } from './services/geminiService';
+import BackButton from './components/BackButton';
 
 export default function App() {
   const [state, setState] = useState<AppState>({
@@ -15,7 +16,6 @@ export default function App() {
     diary: [],
     currentReflection: null,
     viewingReflection: null,
-    geminiChat: null,
   });
 
   useEffect(() => {
@@ -56,7 +56,6 @@ export default function App() {
       diary: [],
       currentReflection: null,
       viewingReflection: null,
-      geminiChat: null,
     });
   };
 
@@ -66,11 +65,10 @@ export default function App() {
       screen: Screen.Input,
       currentReflection: null,
       viewingReflection: null,
-      geminiChat: null,
     }));
   };
 
-  const startSimulation = async (situation: Omit<Situation, 'id' | 'date'>) => {
+  const startSimulation = (situation: Omit<Situation, 'id' | 'date'>) => {
     const newReflection: Reflection = {
       ...situation,
       id: new Date().toISOString(),
@@ -79,17 +77,11 @@ export default function App() {
       report: null,
     };
 
-    try {
-        const chat = await startChatSession(newReflection);
-        setState(prev => ({
-            ...prev,
-            currentReflection: newReflection,
-            geminiChat: chat,
-            screen: Screen.Simulation,
-        }));
-    } catch (error) {
-        console.error("Failed to start chat session:", error);
-    }
+    setState(prev => ({
+      ...prev,
+      currentReflection: newReflection,
+      screen: Screen.Simulation,
+    }));
   };
 
   const endSimulation = async (conversation: Message[]) => {
@@ -133,8 +125,8 @@ export default function App() {
       case Screen.Input:
         return <SituationInputScreen onStartSimulation={startSimulation} onBack={() => navigate(Screen.Home)} />;
       case Screen.Simulation:
-        if (state.currentReflection && state.geminiChat) {
-          return <SimulationScreen reflection={state.currentReflection} chat={state.geminiChat} onEndSimulation={endSimulation} />;
+        if (state.currentReflection) {
+          return <SimulationScreen reflection={state.currentReflection} onEndSimulation={endSimulation} />;
         }
         return <HomeScreen user={state.user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} />;
       case Screen.Report:
@@ -155,10 +147,48 @@ export default function App() {
     }
   };
 
+  const backAction = (() => {
+    switch (state.screen) {
+      case Screen.Input:
+        return () => navigate(Screen.Home);
+      case Screen.Simulation:
+        return () =>
+          setState(prev => ({
+            ...prev,
+            screen: Screen.Home,
+            currentReflection: null,
+          }));
+      case Screen.Report:
+        if (state.viewingReflection) {
+          return () =>
+            setState(prev => ({
+              ...prev,
+              screen: Screen.Diary,
+              viewingReflection: null,
+            }));
+        }
+        return () =>
+          setState(prev => ({
+            ...prev,
+            screen: Screen.Home,
+            viewingReflection: null,
+          }));
+      case Screen.Diary:
+        return () => navigate(Screen.Home);
+      default:
+        return null;
+    }
+  })();
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-800 flex items-center justify-center">
-      <div className="container mx-auto max-w-5xl p-4 w-full">
-        {renderContent()}
+      <div className="container mx-auto max-w-5xl p-4 w-full relative pt-12">
+        {backAction && (
+          <div className="absolute left-4 top-4">
+            <BackButton onClick={backAction} />
+          </div>
+        )}
+        <div className="pt-4">{renderContent()}</div>
       </div>
     </div>
   );

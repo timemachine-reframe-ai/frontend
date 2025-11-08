@@ -11,7 +11,7 @@ Vite + React 기반의 TIMEMACHINE AI 클라이언트입니다. 이 디렉터리
 cd frontend
 npm install
 cp .env.example .env
-# VITE_GEMINI_API_KEY (및 필요시 VITE_GEMINI_MODEL) 입력
+# 백엔드 주소 설정 (예: http://localhost:8000)
 npm run dev
 ```
 
@@ -19,8 +19,7 @@ npm run dev
 
 | 환경 변수 | 설명 |
 | --- | --- |
-| `VITE_GEMINI_API_KEY` | 필수. `@google/genai` 클라이언트에 주입되는 API 키 |
-| `VITE_GEMINI_MODEL` | 선택. 기본값은 `gemini-2.5-flash` |
+| `VITE_BACKEND_URL` | FastAPI 백엔드의 베이스 URL (예: `http://localhost:8000`) |
 
 ## npm 스크립트
 | 명령 | 설명 |
@@ -30,8 +29,8 @@ npm run dev
 | `npm run preview` | 빌드 결과를 로컬에서 미리보기 |
 
 ## 백엔드 연동 팁
-- API URL 변경이나 신규 호출은 `src/services/`에서 관리합니다.
-- FastAPI 주소를 환경 변수로 관리하고 싶다면 `.env`에 `VITE_API_BASE_URL=http://localhost:8000/api` 같은 값을 추가하세요.
+- 모든 Gemini 호출은 FastAPI(`/api/reflections/*`)를 통해 이뤄지므로, 프론트에는 어떤 키도 저장하지 않습니다.
+- API 호출 로직은 `src/services/geminiService.ts`에서 관리하며 `VITE_BACKEND_URL`을 통해 베이스 URL을 주입합니다.
 
 ## 프로젝트 구조
 ```

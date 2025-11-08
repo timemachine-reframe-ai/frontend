@@ -1,5 +1,3 @@
-import { Chat } from '@google/genai';
-
 export enum Screen {
   Auth = 'AUTH',
   Home = 'HOME',
@@ -63,5 +61,4 @@ export interface AppState {
     diary: Reflection[];
     currentReflection: Reflection | null;
     viewingReflection: Reflection | null;
-    geminiChat: Chat | null;
 }
