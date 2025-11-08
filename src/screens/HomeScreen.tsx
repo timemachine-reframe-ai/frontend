@@ -72,6 +72,72 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
                 <p className="text-base text-slate-600 max-w-2xl mx-auto">
                     이곳은 당신의 감정을 탐색할 수 있는 안전한 공간입니다. 대화 시뮬레이션을 통해 명확성을 얻고, 소통을 연습하며, 자신의 감정적 반응을 더 잘 이해할 수 있습니다.
                 </p>
+                <div className="mt-8">
+                  <h4 className="text-2xl font-semibold text-violet-700 mb-6">사용 가이드</h4>
+
+                  <div className="grid gap-4">
+                    {/* 1단계 */}
+                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
+                      <img
+                        src="src/assets/images/guide-input.png"
+                        alt="상황 입력 예시"
+                        className="w-full rounded-lg shadow-md object-cover"
+                      />
+                      <div className="text-left">
+                        <h5 className="text-xl font-bold text-violet-700 mb-2">상황 입력</h5>
+                        <p className="text-slate-600">
+                          최근에 있었던 문제 상황과 그 때 당신이 느낀 감정, 상대방의 정보등을 간단히 입력하세요. AI가 맥락을 이해하고 대화를 준비합니다.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 2단계 */}
+                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
+                      <img
+                        src="src/assets/images/guide-simulation.png"
+                        alt="AI 대화 예시"
+                        className="w-full rounded-lg shadow-md object-cover"
+                      />
+                      <div className="text-left">
+                        <h5 className="text-xl font-bold text-violet-700 mb-2">대화 시뮬레이션</h5>
+                        <p className="text-slate-600">
+                          그때 상황으로 다시 돌아가 AI를 상대로 대화를 시뮬레이션 합니다. 이번에는 원하던 결과를 얻을 수 있도록 더 나은 소통을 해 봅시다.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3단계 */}
+                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
+                      <img
+                        src="src/assets/images/guide-report.png"
+                        alt="리포트 생성 예시"
+                        className="w-full rounded-lg shadow-md object-cover"
+                      />
+                      <div className="text-left">
+                        <h5 className="text-xl font-bold text-violet-700 mb-2">리포트 생성</h5>
+                        <p className="text-slate-600">
+                          대화가 끝나면 AI가 당신의 감정 흐름과 통찰을 분석해 리포트를 제공합니다. 성장의 포인트를 확인하세요.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 4단계 */}
+                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
+                      <img
+                        src="src/assets/images/guide-list.png"
+                        alt="회고 목록 예시"
+                        className="w-full rounded-lg shadow-md object-cover"
+                      />
+                      <div className="text-left">
+                        <h5 className="text-xl font-bold text-violet-700 mb-2">회고 목록에서 다시 보기</h5>
+                        <p className="text-slate-600">
+                          저장된 회고 기록을 언제든 다시 열람하며 자신의 변화와 성장 과정을 추적할 수 있습니다.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
             </div>
         </div>
       </div>
