@@ -3,6 +3,8 @@ import PlusIcon from '../components/icons/PlusIcon';
 import DiaryIcon from '../components/icons/DiaryIcon';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import { User } from '../types';
+import ChevronLeftIcon from '../components/icons/ChevronLeftIcon';
+import ChevronRightIcon from '../components/icons/ChevronRightIcon';
 
 interface HomeScreenProps {
   user: User;
@@ -11,7 +13,100 @@ interface HomeScreenProps {
   onLogout: () => void;
 }
 
+const guideSteps = [
+  {
+    images: [
+      "src/assets/images/guide-input1.png",
+      "src/assets/images/guide-input2.png",
+      "src/assets/images/guide-input3.png",
+      "src/assets/images/guide-input4.png",
+      "src/assets/images/guide-input5.png",
+    ],
+    alt: "상황 입력 예시",
+    title: "1. 상황 입력",
+    description: "최근에 있었던 문제 상황과 그 때 당신이 느낀 감정, 상대방의 정보등을 간단히 입력하세요. AI가 맥락을 이해하고 대화를 준비합니다.",
+  },
+  {
+    image: "src/assets/images/guide-simulation.png",
+    alt: "AI 대화 예시",
+    title: "2. 대화 시뮬레이션",
+    description: "그때 상황으로 다시 돌아가 AI를 상대로 대화를 시뮬레이션 합니다. 이번에는 원하던 결과를 얻을 수 있도록 더 나은 소통을 해 봅시다.",
+  },
+  {
+    image: "src/assets/images/guide-report.png",
+    alt: "리포트 생성 예시",
+    title: "3. 리포트 생성",
+    description: "대화가 끝나면 AI가 당신의 감정 흐름과 통찰을 분석해 리포트를 제공합니다. 성장의 포인트를 확인하세요.",
+  },
+  {
+    image: "src/assets/images/guide-list.png",
+    alt: "회고 목록 예시",
+    title: "4. 회고 목록에서 다시 보기",
+    description: "저장된 회고 기록을 언제든 다시 열람하며 자신의 변화와 성장 과정을 추적할 수 있습니다.",
+  },
+];
+
+// @ts-ignore
+const GuideSlideContent = ({ step, isFirstStep, selectedImageIndex, onThumbnailClick, isInvisible }) => {
+  const content = isFirstStep ? (
+    <>
+      <img
+        src={step.images[selectedImageIndex]}
+        alt={step.alt}
+        className="w-full rounded-lg shadow-md object-cover aspect-[4/3]"
+      />
+      <div className="grid grid-cols-5 gap-2 w-full">
+        {step.images.map((imgSrc, imgIndex) => (
+          <img
+            key={imgIndex}
+            src={imgSrc}
+            alt={`Thumbnail ${imgIndex + 1}`}
+            className={`w-full rounded-md cursor-pointer border-2 transition-colors ${
+              selectedImageIndex === imgIndex ? 'border-violet-700' : 'border-transparent hover:border-violet-300'
+            }`}
+            onClick={() => onThumbnailClick(imgIndex)}
+          />
+        ))}
+      </div>
+      <div className="text-left w-full">
+        <h5 className="text-xl font-bold text-violet-700 mb-2">{step.title}</h5>
+        <p className="text-slate-600">{step.description}</p>
+      </div>
+    </>
+  ) : (
+    <>
+      <img
+        src={step.image}
+        alt={step.alt}
+        className="w-full rounded-lg shadow-md object-cover aspect-[4/3]"
+      />
+      <div className="text-left w-full">
+        <h5 className="text-xl font-bold text-violet-700 mb-2">{step.title}</h5>
+        <p className="text-slate-600">{step.description}</p>
+      </div>
+    </>
+  );
+
+  return (
+    <div className={`flex flex-col items-start gap-6 w-full pb-12 ${isInvisible ? 'invisible' : ''}`}>
+      {content}
+    </div>
+  );
+};
+
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogout }) => {
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+
+  const handleNext = () => {
+    setCurrentStep((prev) => (prev < guideSteps.length - 1 ? prev + 1 : prev));
+  };
+
+  const handlePrev = () => {
+    setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+
   return (
     <div className="flex flex-col items-center justify-center text-center p-4 animate-fade-in w-full">
       <div className="w-full max-w-4xl">
@@ -74,68 +169,65 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
                 </p>
                 <div className="mt-8">
                   <h4 className="text-2xl font-semibold text-violet-700 mb-6">사용 가이드</h4>
-
-                  <div className="grid gap-4">
-                    {/* 1단계 */}
-                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
-                      <img
-                        src="src/assets/images/guide-input.png"
-                        alt="상황 입력 예시"
-                        className="w-full rounded-lg shadow-md object-cover"
+                  
+                  <div className="relative">
+                    <div className="relative bg-violet-50 p-6 rounded-xl border border-violet-100">
+                      {/* Sizer element to dynamically set container height */}
+                      <GuideSlideContent
+                        step={guideSteps[currentStep]}
+                        isFirstStep={currentStep === 0}
+                        selectedImageIndex={selectedImageIndex}
+                        onThumbnailClick={setSelectedImageIndex}
+                        isInvisible={true}
                       />
-                      <div className="text-left">
-                        <h5 className="text-xl font-bold text-violet-700 mb-2">상황 입력</h5>
-                        <p className="text-slate-600">
-                          최근에 있었던 문제 상황과 그 때 당신이 느낀 감정, 상대방의 정보등을 간단히 입력하세요. AI가 맥락을 이해하고 대화를 준비합니다.
-                        </p>
-                      </div>
+
+                      {guideSteps.map((step, index) => (
+                        <div
+                          key={index}
+                          className={`transition-opacity duration-500 ease-in-out absolute top-0 left-0 w-full h-full p-6 flex flex-col items-start justify-center ${
+                            index === currentStep ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                          }`}
+                        >
+                          <GuideSlideContent
+                            step={step}
+                            isFirstStep={index === 0}
+                            selectedImageIndex={selectedImageIndex}
+                            onThumbnailClick={setSelectedImageIndex}
+                            isInvisible={false}
+                          />
+                        </div>
+                      ))}
                     </div>
 
-                    {/* 2단계 */}
-                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
-                      <img
-                        src="src/assets/images/guide-simulation.png"
-                        alt="AI 대화 예시"
-                        className="w-full rounded-lg shadow-md object-cover"
-                      />
-                      <div className="text-left">
-                        <h5 className="text-xl font-bold text-violet-700 mb-2">대화 시뮬레이션</h5>
-                        <p className="text-slate-600">
-                          그때 상황으로 다시 돌아가 AI를 상대로 대화를 시뮬레이션 합니다. 이번에는 원하던 결과를 얻을 수 있도록 더 나은 소통을 해 봅시다.
-                        </p>
-                      </div>
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+                      {guideSteps.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentStep(index)}
+                          className={`w-3 h-3 rounded-full transition-colors ${
+                            currentStep === index ? 'bg-violet-700' : 'bg-violet-200 hover:bg-violet-300'
+                          }`}
+                          aria-label={`Go to step ${index + 1}`}
+                        />
+                      ))}
                     </div>
 
-                    {/* 3단계 */}
-                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
-                      <img
-                        src="src/assets/images/guide-report.png"
-                        alt="리포트 생성 예시"
-                        className="w-full rounded-lg shadow-md object-cover"
-                      />
-                      <div className="text-left">
-                        <h5 className="text-xl font-bold text-violet-700 mb-2">리포트 생성</h5>
-                        <p className="text-slate-600">
-                          대화가 끝나면 AI가 당신의 감정 흐름과 통찰을 분석해 리포트를 제공합니다. 성장의 포인트를 확인하세요.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* 4단계 */}
-                    <div className="flex flex-col items-start gap-6 bg-violet-50 p-6 rounded-xl border border-violet-100">
-                      <img
-                        src="src/assets/images/guide-list.png"
-                        alt="회고 목록 예시"
-                        className="w-full rounded-lg shadow-md object-cover"
-                      />
-                      <div className="text-left">
-                        <h5 className="text-xl font-bold text-violet-700 mb-2">회고 목록에서 다시 보기</h5>
-                        <p className="text-slate-600">
-                          저장된 회고 기록을 언제든 다시 열람하며 자신의 변화와 성장 과정을 추적할 수 있습니다.
-                        </p>
-                      </div>
-                    </div>
-
+                    <button
+                      onClick={handlePrev}
+                      disabled={currentStep === 0}
+                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/50 hover:bg-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      aria-label="Previous step"
+                    >
+                      <ChevronLeftIcon className="w-6 h-6 text-violet-700" />
+                    </button>
+                    <button
+                      onClick={handleNext}
+                      disabled={currentStep === guideSteps.length - 1}
+                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/50 hover:bg-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      aria-label="Next step"
+                    >
+                      <ChevronRightIcon className="w-6 h-6 text-violet-700" />
+                    </button>
                   </div>
                 </div>
             </div>
