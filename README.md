@@ -1,69 +1,97 @@
 # TIMEMACHINE AI – 프론트엔드
 
-타임머신 AI는 감정 회고와 대화 시뮬레이션을 돕는 React 단일 페이지 앱입니다. 브라우저는 FastAPI 백엔드만 호출하며, Gemini API 키는 모두 서버에서 관리됩니다.
+이 폴더는 사용자가 회고 내용을 입력하고, AI와 대화를 나누며, 리포트를 확인할 수 있는 React 앱입니다. 브라우저는 FastAPI 백엔드만 호출하고, Gemini 키는 서버 쪽에서만 사용하므로 프런트에는 노출되지 않습니다.
 
 ---
 
-## 1. 준비물 
-1. **Node.js 20 이상** 설치 – [공식 다운로드](https://nodejs.org/ko)
-2. 저장소 루트에서 `frontend` 폴더로 이동
-3. 아래 순서를 그대로 실행
+## 1. 가장 빠르게 실행하기
+
+1. [Node.js 20+](https://nodejs.org/ko) 를 설치합니다.
+2. 프로젝트 루트에서 `frontend` 폴더로 이동합니다.
+3. 아래 순서를 그대로 입력하세요.
 
 ```bash
 cd frontend
-npm install                 # 필요한 라이브러리 설치
-cp .env.example .env        # 백엔드 주소가 다르면 .env 수정
-npm run dev                 # 개발 서버 시작
+npm install
+cp .env.example .env         # 필요하면 VITE_BACKEND_URL 수정
+npm run dev
 ```
 
-- 브라우저에서 <http://localhost:3000>으로 접속하면 됩니다.
-- `VITE_BACKEND_URL` 기본값은 `http://localhost:8000` 이며, 백엔드 주소가 다르면 `.env`에서 바꿔 주세요.
-
-빌드/배포가 필요하면 `npm run build`로 `dist/` 결과물을 생성하고 `npm run preview`로 확인할 수 있습니다.
+- 브라우저에서 <http://localhost:3000> 을 열면 앱이 보입니다.
+- 백엔드 주소가 바뀌면 `.env` 의 `VITE_BACKEND_URL` 만 바꿔 주면 됩니다.
+- 배포 혹은 테스트 빌드가 필요하면 `npm run build` → `npm run preview` 순서로 확인하세요.
 
 ---
 
-## 2. 주요 npm 스크립트
+## 2. 자주 쓰는 npm 스크립트
+
 | 명령 | 설명 |
 | --- | --- |
-| `npm run dev` | 개발 서버 (자동 새로고침) |
-| `npm run build` | 프로덕션 번들 생성 |
-| `npm run preview` | 빌드 결과를 로컬에서 미리보기 |
+| `npm run dev` | 개발 서버 실행 (파일 저장 시 자동 새로고침) |
+| `npm run build` | 프로덕션 번들 생성 (`dist/`) |
+| `npm run preview` | 빌드 결과를 로컬에서 확인 |
 
 ---
 
-## 3. 폴더 구조 (기능 중심)
+## 3. 폴더 구조를 간단히 이해하기
+
 ```
 src/
-├── app/                      # 전역 App 컨테이너
-├── features/
-│   ├── auth/                 # 로그인/회원가입 화면
-│   ├── home/                 # 대시보드 및 가이드
-│   ├── input/                # 회고 입력 단계
-│   ├── simulation/           # 대화 시뮬레이션
-│   ├── report/               # AI 리포트 표시
-│   ├── diary/                # 회고 목록/필터링
-│   └── reflection/hooks/     # 전역 상태 관리 훅(useReflectionApp)
+├── app/                최상위 App 컴포넌트
+├── features/           화면·기능 단위 폴더
+│   ├── auth/           로그인/회원가입
+│   ├── home/           대시보드 + 가이드
+│   ├── input/          회고 입력 5단계 프로세스
+│   ├── simulation/     대화 시뮬레이션 UI
+│   ├── report/         AI 리포트 화면
+│   ├── diary/          회고 목록 및 필터링
+│   └── reflection/hooks/  전역 상태 관리 훅(useReflectionApp)
 ├── shared/
-│   ├── components/           # 재사용 UI (버튼, 아이콘 등)
-│   ├── services/             # 백엔드 fetch, 로컬스토리지 접근
-│   └── types.ts              # 공통 타입/열거형
-├── assets/                   # 이미지 리소스
-└── main.tsx                  # React 진입점
+│   ├── components/     버튼, 아이콘 등 재사용 UI
+│   ├── services/       fetch 래퍼, LocalStorage 도우미
+│   └── types.ts        공통 타입/열거형
+├── assets/             이미지 등 정적 리소스
+└── main.tsx            진입점
 ```
 
-- `shared/services/geminiService.ts` 는 백엔드 `/api/reflections/{summary,chat}`를 호출합니다.
-- `shared/services/storageService.ts` 가 LocalStorage 관리를 담당해, 컴포넌트는 단순히 훅을 이용하면 됩니다.
-- 모든 화면은 `useReflectionApp` 훅에서 제공하는 상태와 액션만 사용하므로 진입 장벽이 낮습니다.
+핵심은 `features` 폴더 하나만 보면 “어떤 화면이 있는지” 바로 파악된다는 점입니다. 전역 상태는 `useReflectionApp` 훅 한 곳에서 관리하고, 각 화면은 필요한 액션만 props로 받아 사용합니다.
 
 ---
 
-## 4. 기능 개요
-- **로그인/회원가입**: 브라우저 LocalStorage에 사용자와 회고를 저장하는 데모용 인증
-- **홈 화면**: 새로운 회고 시작, 일기 목록 이동, 서비스 사용 가이드 제공
-- **회고 입력**: 5단계 폼으로 상황/감정/페르소나 정보를 수집
-- **대화 시뮬레이션**: 백엔드와 실시간 대화하며 턴 수 관리 및 연장 기능 제공
-- **AI 리포트**: 요약·핵심 인사이트·추천 표현을 카드 형태로 표시, 원하는 경우 일기에 저장
-- **다이어리**: 감정 필터와 카드 리스트로 기존 회고를 다시 열람
+## 4. 어떤 화면이 있나요?
 
-백엔드만 켜져 있다면 비개발자도 위 설명대로 명령어 몇 개로 프런트를 실행해 체험할 수 있습니다.
+- **Auth** – 이메일과 비밀번호만으로 로그인/회원가입을 흉내 내는 데모 UI입니다. 실제 인증 서버는 없고 LocalStorage 에 저장합니다.
+- **Home** – “새 회고 시작” / “나의 회고 목록” / 사용 가이드를 보여 줍니다.
+- **Input** – 5단계 폼에서 상황, 감정, 행동, 원하는 결과, persona 정보를 모읍니다.
+- **Simulation** – 백엔드 `/api/reflections/chat` 을 불러 AI와 대화를 나눕니다. 턴수를 넘기면 연장 팝업이 뜹니다.
+- **Report** – `/api/reflections/summary` 응답을 카드 스타일로 보여주고 일기에 저장할 수 있습니다.
+- **Diary** – 저장된 회고 목록을 감정별로 필터링하고, 보고서를 다시 열람합니다.
+
+---
+
+## 5. 백엔드와 어떻게 통신하나요?
+
+- 모든 통신은 `shared/services/geminiService.ts` 를 통해 이루어집니다.
+  - `generateReport(reflection)` → `/api/reflections/summary`
+  - `requestChatReply(reflection, conversation, message)` → `/api/reflections/chat`
+- LocalStorage 접근은 `shared/services/storageService.ts` 에서 관리합니다. `useReflectionApp` 훅이 이 서비스를 사용해 사용자/다이어리 상태를 불러오고 저장합니다.
+
+---
+
+## 6. 새 팀원을 위해: 개발 흐름 요약
+
+1. `npm run dev` 로 브라우저에서 앱을 띄웁니다.
+2. `features` 폴더에서 만들고 싶은 화면(혹은 기능)을 찾습니다.
+3. 필요한 전역 상태나 액션은 `useReflectionApp` 훅에 추가합니다.
+4. 백엔드 호출이 필요하면 `shared/services/geminiService.ts` 에 fetch 함수를 정의한 뒤 사용하는 화면에 주입합니다.
+5. 공통 UI가 필요하면 `shared/components` 에 작은 컴포넌트를 만들고 재사용합니다.
+
+이 흐름만 익히면 누구나 손쉽게 기능을 추가할 수 있습니다.
+
+---
+
+## 7. 도움말
+
+- 백엔드만 실행되어 있다면, 이 프런트는 명령어 몇 개로 바로 올릴 수 있습니다.
+- TypeScript를 두려워하지 마세요. `shared/types.ts` 에 정의된 타입을 참고하면 컴파일러가 대부분의 실수를 잡아줍니다.
+- 추가로 궁금한 점이 있다면 README 최상단을 다시 읽어 보거나, `features/reflection/hooks/useReflectionApp.ts` 를 열어 앱 전체 흐름을 확인해 보세요.
