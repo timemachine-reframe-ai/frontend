@@ -1,10 +1,10 @@
 import React from 'react';
-import PlusIcon from '../components/icons/PlusIcon';
-import DiaryIcon from '../components/icons/DiaryIcon';
-import LogoutIcon from '../components/icons/LogoutIcon';
-import { User } from '../types';
-import ChevronLeftIcon from '../components/icons/ChevronLeftIcon';
-import ChevronRightIcon from '../components/icons/ChevronRightIcon';
+import PlusIcon from '@/shared/components/icons/PlusIcon';
+import DiaryIcon from '@/shared/components/icons/DiaryIcon';
+import LogoutIcon from '@/shared/components/icons/LogoutIcon';
+import { User } from '@/shared/types';
+import ChevronLeftIcon from '@/shared/components/icons/ChevronLeftIcon';
+import ChevronRightIcon from '@/shared/components/icons/ChevronRightIcon';
 
 interface HomeScreenProps {
   user: User;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Reflection } from '../types';
-import CheckIcon from '../components/icons/CheckIcon';
-import SparklesIcon from '../components/icons/SparklesIcon';
+import { Reflection } from '@/shared/types';
+import CheckIcon from '@/shared/components/icons/CheckIcon';
+import SparklesIcon from '@/shared/components/icons/SparklesIcon';
 
 interface ReportScreenProps {
   reflection: Reflection;

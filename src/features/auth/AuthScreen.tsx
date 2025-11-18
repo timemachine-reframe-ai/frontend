@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '../types';
+import { User } from '@/shared/types';
 
 interface AuthScreenProps {
   onLogin: (user: User) => void;

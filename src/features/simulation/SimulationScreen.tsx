@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Reflection, Message } from '../types';
-import { requestChatReply } from '../services/geminiService';
+import { Reflection, Message } from '@/shared/types';
+import { requestChatReply } from '@/shared/services/geminiService';
 
 interface SimulationScreenProps {
   reflection: Reflection;

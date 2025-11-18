@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Reflection, Emotion, EMOTIONS } from '../types';
-import PlusIcon from '../components/icons/PlusIcon';
-import LogoutIcon from '../components/icons/LogoutIcon';
+import { Reflection, Emotion, EMOTIONS } from '@/shared/types';
+import PlusIcon from '@/shared/components/icons/PlusIcon';
+import LogoutIcon from '@/shared/components/icons/LogoutIcon';
 
 interface DiaryScreenProps {
   diary: Reflection[];

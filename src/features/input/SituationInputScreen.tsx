@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Emotion, EMOTIONS, Situation } from '../types';
+import { Emotion, EMOTIONS, Situation } from '@/shared/types';
 
 interface SituationInputScreenProps {
   onStartSimulation: (situation: Omit<Situation, 'id' | 'date'>) => void;
