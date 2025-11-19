@@ -37,21 +37,25 @@ npm run dev
 
 ```
 src/
-├── app/                최상위 App 컴포넌트
-├── features/           화면·기능 단위 폴더
-│   ├── auth/           로그인/회원가입
-│   ├── home/           대시보드 + 가이드
-│   ├── input/          회고 입력 5단계 프로세스
-│   ├── simulation/     대화 시뮬레이션 UI
-│   ├── report/         AI 리포트 화면
-│   ├── diary/          회고 목록 및 필터링
-│   └── reflection/hooks/  전역 상태 관리 훅(useReflectionApp)
+├── app/
+│   └── App.tsx               → 전역 상태 훅을 호출해 라우팅/화면 전환 처리
+├── features/
+│   ├── auth/                 → AuthScreen.tsx
+│   ├── home/                 → HomeScreen.tsx + 가이드 슬라이드
+│   ├── input/                → SituationInputScreen.tsx (5단계 폼)
+│   ├── simulation/           → SimulationScreen.tsx (채팅 UI)
+│   ├── report/               → ReportScreen.tsx
+│   ├── diary/                → DiaryScreen.tsx
+│   └── reflection/
+│       └── hooks/useReflectionApp.ts → 전역 AppState와 액션(로그인/시뮬레이션 등) 정의
 ├── shared/
-│   ├── components/     버튼, 아이콘 등 재사용 UI
-│   ├── services/       fetch 래퍼, LocalStorage 도우미
-│   └── types.ts        공통 타입/열거형
-├── assets/             이미지 등 정적 리소스
-└── main.tsx            진입점
+│   ├── components/           → 공통 BackButton, 아이콘 SVG 등
+│   ├── services/
+│   │   ├── geminiService.ts  → 백엔드 fetch 함수 집합
+│   │   └── storageService.ts → LocalStorage 접근 유틸
+│   └── types.ts              → Screen, Reflection 등 공통 타입
+├── assets/                   → 이미지/아이콘 리소스
+└── main.tsx                  → ReactDOM.createRoot 진입점
 ```
 
 핵심은 `features` 폴더 하나만 보면 “어떤 화면이 있는지” 바로 파악된다는 점입니다. 전역 상태는 `useReflectionApp` 훅 한 곳에서 관리하고, 각 화면은 필요한 액션만 props로 받아 사용합니다.
