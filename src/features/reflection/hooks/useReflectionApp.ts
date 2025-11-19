@@ -113,7 +113,7 @@ export const useReflectionApp = () => {
       if (!reflectionSnapshot) return;
 
       try {
-        const report = await generateReport(reflectionSnapshot);
+        const report = await generateReport(reflectionSnapshot, conversation);
         setState(prev =>
           prev.currentReflection
             ? { ...prev, currentReflection: { ...prev.currentReflection, report } }
