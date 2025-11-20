@@ -23,7 +23,13 @@ export const EMOTIONS = [
 export type Emotion = typeof EMOTIONS[number];
 
 export interface User {
-  email: string;
+  id?: number;
+  loginId: string;
+  accessToken: string;
+  tokenType: string;
+  email?: string;
+  name?: string;
+  username?: string;
 }
 
 export interface Situation {

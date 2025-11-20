@@ -1,16 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Message, Reflection, Screen, Situation, User } from '@/shared/types';
-import { generateReport } from '@/shared/services/geminiService';
-import {
-  clearCurrentUser,
-  loadCurrentUser,
-  loadDiary,
-  saveCurrentUser,
-  saveDiary,
-} from '@/shared/services/storageService';
+import { fetchReportHistory, generateReport } from '@/shared/services/geminiService';
+import { clearCurrentUser, loadCurrentUser, saveCurrentUser } from '@/shared/services/storageService';
 
 interface AppActions {
   navigate: (screen: Screen) => void;
+  goToAuth: () => void;
   handleLogin: (user: User) => void;
   handleLogout: () => void;
   startNewReflection: () => void;
@@ -25,45 +20,68 @@ interface AppActions {
 
 export const useReflectionApp = () => {
   const [state, setState] = useState<AppState>({
-    screen: Screen.Auth,
+    screen: Screen.Home,
     user: null,
     diary: [],
     currentReflection: null,
     viewingReflection: null,
   });
 
+  const diaryRefreshInFlight = useRef(false);
+  const refreshDiary = useCallback(async () => {
+    if (diaryRefreshInFlight.current) return;
+    diaryRefreshInFlight.current = true;
+    try {
+      const diaryFromServer = await fetchReportHistory();
+      setState(prev => ({ ...prev, diary: diaryFromServer }));
+    } catch (error) {
+      console.error('Failed to load diary from server:', error);
+    } finally {
+      diaryRefreshInFlight.current = false;
+    }
+  }, []);
+
+  const initialDiaryRequested = useRef(false);
   useEffect(() => {
     const storedUser = loadCurrentUser();
     if (storedUser) {
-      const diary = loadDiary(storedUser.email);
       setState(prev => ({
         ...prev,
         user: storedUser,
-        diary,
         screen: Screen.Home,
       }));
+      if (!initialDiaryRequested.current) {
+        initialDiaryRequested.current = true;
+        void refreshDiary();
+      }
     }
-  }, []);
+  }, [refreshDiary]);
 
   const navigate = useCallback((screen: Screen) => {
     setState(prev => ({ ...prev, screen }));
   }, []);
 
-  const handleLogin = useCallback((user: User) => {
-    const diary = loadDiary(user.email);
-    saveCurrentUser(user);
-    setState(prev => ({
-      ...prev,
-      user,
-      diary,
-      screen: Screen.Home,
-    }));
+  const goToAuth = useCallback(() => {
+    setState(prev => ({ ...prev, screen: Screen.Auth }));
   }, []);
+
+  const handleLogin = useCallback(
+    (user: User) => {
+      saveCurrentUser(user);
+      setState(prev => ({
+        ...prev,
+        user,
+        screen: Screen.Home,
+      }));
+      void refreshDiary();
+    },
+    [refreshDiary],
+  );
 
   const handleLogout = useCallback(() => {
     clearCurrentUser();
     setState({
-      screen: Screen.Auth,
+      screen: Screen.Home,
       user: null,
       diary: [],
       currentReflection: null,
@@ -127,26 +145,21 @@ export const useReflectionApp = () => {
   );
 
   const saveToDiary = useCallback(() => {
-    let nextDiary: Reflection[] | null = null;
-    let userEmail: string | null = null;
-
+    let userForRefresh: User | null = null;
     setState(prev => {
       if (!prev.currentReflection || !prev.user) return prev;
-      const updatedDiary = [...prev.diary, prev.currentReflection];
-      nextDiary = updatedDiary;
-      userEmail = prev.user.email;
+      userForRefresh = prev.user;
       return {
         ...prev,
-        diary: updatedDiary,
         currentReflection: null,
         screen: Screen.Diary,
       };
     });
 
-    if (nextDiary && userEmail) {
-      saveDiary(userEmail, nextDiary);
+    if (userForRefresh) {
+      void refreshDiary();
     }
-  }, []);
+  }, [refreshDiary]);
 
   const viewReport = useCallback((reflection: Reflection) => {
     setState(prev => ({
@@ -182,6 +195,7 @@ export const useReflectionApp = () => {
 
   const actions: AppActions = {
     navigate,
+    goToAuth,
     handleLogin,
     handleLogout,
     startNewReflection,
