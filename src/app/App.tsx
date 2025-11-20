@@ -13,6 +13,7 @@ export default function App() {
   const { state, actions } = useReflectionApp();
   const { user, screen, currentReflection, viewingReflection, diary } = state;
   const {
+    goToAuth,
     handleLogin,
     handleLogout,
     startNewReflection,
@@ -28,7 +29,18 @@ export default function App() {
 
   const renderContent = () => {
     if (!user) {
-        return <AuthScreen onLogin={handleLogin} />;
+        if (screen === Screen.Auth) {
+          return <AuthScreen onLogin={handleLogin} />;
+        }
+        return (
+          <HomeScreen
+            user={null}
+            onStart={() => goToAuth()}
+            onDiary={() => goToAuth()}
+            onLogout={() => goToAuth()}
+            onLogin={() => goToAuth()}
+          />
+        );
     }
     
     switch (screen) {
@@ -38,7 +50,7 @@ export default function App() {
         if (currentReflection) {
           return <SimulationScreen reflection={currentReflection} onEndSimulation={endSimulation} />;
         }
-        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} />;
+        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} onLogin={() => goToAuth()} />;
       case Screen.Report:
         const reflectionToView: Reflection | null = viewingReflection || currentReflection;
         if (reflectionToView) {
@@ -48,12 +60,12 @@ export default function App() {
                 onHome={() => viewingReflection ? navigate(Screen.Diary) : navigate(Screen.Home)}
             />;
         }
-        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} />;
+        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} onLogin={() => goToAuth()} />;
       case Screen.Diary:
         return <DiaryScreen diary={diary} onViewReport={viewReport} onNewReflection={startNewReflection} onLogout={handleLogout} />;
       case Screen.Home:
       default:
-        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} />;
+        return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} onLogin={() => goToAuth()} />;
     }
   };
 
