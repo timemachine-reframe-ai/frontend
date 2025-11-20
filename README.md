@@ -51,7 +51,9 @@ src/
 ├── shared/
 │   ├── components/           → 공통 BackButton, 아이콘 SVG 등
 │   ├── services/
-│   │   ├── geminiService.ts  → 백엔드 fetch 함수 집합
+│   │   ├── apiClient.ts      → API base URL/헤더/JWT 처리
+│   │   ├── authService.ts    → 로그인/회원가입/프로필 호출
+│   │   ├── geminiService.ts  → 채팅/리포트 fetch 함수 집합
 │   │   └── storageService.ts → LocalStorage 접근 유틸
 │   └── types.ts              → Screen, Reflection 등 공통 타입
 ├── assets/                   → 이미지/아이콘 리소스
@@ -64,21 +66,22 @@ src/
 
 ## 4. 어떤 화면이 있나요?
 
-- **Auth** – 이메일과 비밀번호만으로 로그인/회원가입을 흉내 내는 데모 UI입니다. 실제 인증 서버는 없고 LocalStorage 에 저장합니다.
+- **Auth** – `/api/login`으로 로그인, `/api/users`로 회원가입, 로그인 후 `/api/me`로 프로필을 최신화합니다. 발급된 access token은 LocalStorage에 저장합니다.
 - **Home** – “새 회고 시작” / “나의 회고 목록” / 사용 가이드를 보여 줍니다.
 - **Input** – 5단계 폼에서 상황, 감정, 행동, 원하는 결과, persona 정보를 모읍니다.
-- **Simulation** – 백엔드 `/api/reflections/chat` 을 불러 AI와 대화를 나눕니다. 턴수를 넘기면 연장 팝업이 뜹니다.
-- **Report** – `/api/reflections/summary` 응답을 카드 스타일로 보여주고 일기에 저장할 수 있습니다.
-- **Diary** – 저장된 회고 목록을 감정별로 필터링하고, 보고서를 다시 열람합니다.
+- **Simulation** – `/api/reflections/chat`으로 AI와 대화를 시뮬레이션합니다. 턴을 모두 쓰면 연장 팝업이 뜹니다.
+- **Report** – `/api/reflections/reports` POST로 리포트를 생성해 보여줍니다.
+- **Diary** – `/api/reflections/reports` GET으로 저장된 회고/리포트를 불러옵니다. (현재 감정 필터 없이 리스트만 제공합니다.)
 
 ---
 
 ## 5. 백엔드와 어떻게 통신하나요?
 
-- 모든 통신은 `shared/services/geminiService.ts` 를 통해 이루어집니다.
-  - `generateReport(reflection)` → `/api/reflections/summary`
-  - `requestChatReply(reflection, conversation, message)` → `/api/reflections/chat`
-- LocalStorage 접근은 `shared/services/storageService.ts` 에서 관리합니다. `useReflectionApp` 훅이 이 서비스를 사용해 사용자/다이어리 상태를 불러오고 저장합니다.
+- 모든 통신은 `shared/services`의 fetch 유틸로 이뤄집니다.
+  - `apiClient.ts` – 기본 URL, JSON 헤더, JWT Authorization 헤더를 구성합니다.
+  - `authService.ts` – `/api/login`, `/api/users`, `/api/me`, `/api/login-id/check` 호출.
+  - `geminiService.ts` – `/api/reflections/chat`, `/api/reflections/reports` (POST 생성, GET 목록) 호출.
+- 사용자/토큰은 LocalStorage에서 관리합니다 (`shared/services/storageService.ts`). 전역 상태 훅 `useReflectionApp`이 로그인 시 저장하고, 앱 시작 시 불러옵니다.
 
 ---
 
