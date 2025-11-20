@@ -7,10 +7,11 @@ import ChevronLeftIcon from '@/shared/components/icons/ChevronLeftIcon';
 import ChevronRightIcon from '@/shared/components/icons/ChevronRightIcon';
 
 interface HomeScreenProps {
-  user: User;
+  user: User | null;
   onStart: () => void;
   onDiary: () => void;
   onLogout: () => void;
+  onLogin: () => void;
 }
 
 const guideSteps = [
@@ -95,9 +96,11 @@ const GuideSlideContent = ({ step, isFirstStep, selectedImageIndex, onThumbnailC
 };
 
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogout }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogout, onLogin }) => {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const isGuest = !user;
+  const displayName = (user && (user.name || user.username || user.loginId)) || '게스트';
 
   const handleNext = () => {
     setCurrentStep((prev) => (prev < guideSteps.length - 1 ? prev + 1 : prev));
@@ -107,22 +110,50 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
     setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
+  const handleStartClick = () => {
+    if (isGuest) {
+      onLogin();
+      return;
+    }
+    onStart();
+  };
+
+  const handleDiaryClick = () => {
+    if (isGuest) {
+      onLogin();
+      return;
+    }
+    onDiary();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center text-center p-4 animate-fade-in w-full">
       <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center w-full mb-8">
-            <div className="text-left">
-                <p className="text-lg text-slate-500">환영합니다,</p>
-                <p className="font-semibold text-xl text-slate-700">{user.email}님</p>
-            </div>
-            <button
-                onClick={onLogout}
-                className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors group"
-                aria-label="로그아웃"
-            >
-                <LogoutIcon className="w-6 h-6" />
-                <span className="font-semibold hidden sm:inline group-hover:underline">로그아웃</span>
-            </button>
+            {user && (
+              <div className="text-left">
+                  <p className="text-lg text-slate-500">환영합니다,</p>
+                  <p className="font-semibold text-xl text-slate-700">{displayName}님</p>
+              </div>
+            )}
+            {isGuest ? (
+              <button
+                onClick={onLogin}
+                className="flex items-center gap-2 text-violet-700 hover:text-violet-800 transition-colors group font-semibold"
+                aria-label="로그인"
+              >
+                <span className="hidden sm:inline group-hover:underline">로그인</span>
+              </button>
+            ) : (
+              <button
+                  onClick={onLogout}
+                  className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors group"
+                  aria-label="로그아웃"
+              >
+                  <LogoutIcon className="w-6 h-6" />
+                  <span className="font-semibold hidden sm:inline group-hover:underline">로그아웃</span>
+              </button>
+            )}
         </div>
 
         <div className="mb-12">
@@ -136,7 +167,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div
-            onClick={onStart}
+            onClick={handleStartClick}
             className="group cursor-pointer bg-gradient-to-br from-violet-500 to-purple-600 text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 flex flex-col items-center text-center"
           >
             <div className="bg-white/20 p-4 rounded-full mb-6">
@@ -148,7 +179,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
             </p>
           </div>
           <div
-            onClick={onDiary}
+            onClick={handleDiaryClick}
             className="group cursor-pointer bg-white text-slate-700 p-8 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 flex flex-col items-center text-center"
           >
             <div className="bg-slate-100 group-hover:bg-violet-100 p-4 rounded-full mb-6 transition-colors">
