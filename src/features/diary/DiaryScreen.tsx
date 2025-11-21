@@ -1,5 +1,5 @@
 import React from 'react';
-import { Reflection } from '@/shared/types';
+import { Reflection, Emotion } from '@/shared/types';
 import PlusIcon from '@/shared/components/icons/PlusIcon';
 import LogoutIcon from '@/shared/components/icons/LogoutIcon';
 
@@ -14,10 +14,21 @@ const DiaryScreen: React.FC<DiaryScreenProps> = ({ diary, onViewReport, onNewRef
   const sortedDiary = [...diary].sort(
     (a, b) => new Date(b.id).getTime() - new Date(a.id).getTime(),
   );
+  const [filterEmotion, setFilterEmotion] = React.useState<'전체' | Emotion>('전체');
+
+  const availableEmotions = React.useMemo(() => {
+    const unique = new Set<Emotion>();
+    diary.forEach((item) => item.emotions.forEach((e) => unique.add(e)));
+    return Array.from(unique);
+  }, [diary]);
+
+  const filteredDiary = filterEmotion === '전체'
+    ? sortedDiary
+    : sortedDiary.filter((item) => item.emotions.includes(filterEmotion));
 
   return (
     <div className="animate-fade-in p-2 md:p-4">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-4 md:mb-6">
         <h2 className="text-4xl font-bold text-slate-800">나의 회고 목록</h2>
         <div className="flex items-center gap-3">
           <button
@@ -36,12 +47,41 @@ const DiaryScreen: React.FC<DiaryScreenProps> = ({ diary, onViewReport, onNewRef
           </button>
         </div>
       </div>
+
+      <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-8">
+        <span className="text-sm font-semibold text-slate-600">감정 선택</span>
+        <button
+          onClick={() => setFilterEmotion('전체')}
+          className={`px-3 py-1 rounded-full text-sm font-semibold border transition ${
+            filterEmotion === '전체'
+              ? 'bg-violet-600 text-white border-violet-600 shadow'
+              : 'bg-white text-slate-700 border-slate-200 hover:border-violet-200'
+          }`}
+        >
+          전체
+        </button>
+        {availableEmotions.map((emotion) => (
+          <button
+            key={emotion}
+            onClick={() => setFilterEmotion(emotion)}
+            className={`px-3 py-1 rounded-full text-sm font-semibold border transition ${
+              filterEmotion === emotion
+                ? 'bg-violet-600 text-white border-violet-600 shadow'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-violet-200'
+            }`}
+          >
+            {emotion}
+          </button>
+        ))}
+      </div>
       
       <div>
-        {sortedDiary.length === 0 ? (
+        {filteredDiary.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
                 <p className="text-slate-500 text-lg">
-                    아직 저장된 회고가 없습니다.
+                    {availableEmotions.length === 0
+                      ? '아직 저장된 회고가 없습니다.'
+                      : '선택한 감정에 해당하는 회고가 없습니다.'}
                 </p>
                 <button onClick={onNewReflection} className="mt-6 text-violet-600 font-semibold hover:underline">
                     첫 회고를 시작해보세요
@@ -49,7 +89,7 @@ const DiaryScreen: React.FC<DiaryScreenProps> = ({ diary, onViewReport, onNewRef
             </div>
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedDiary.map(reflection => {
+            {filteredDiary.map(reflection => {
                 const badgeEmotion = reflection.emotions[0] || '기록';
                 const title =
                   reflection.whatHappened ||
