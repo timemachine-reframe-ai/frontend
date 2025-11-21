@@ -13,7 +13,7 @@
 ```bash
 cd frontend
 npm install
-cp .env.example .env         # 필요하면 VITE_BACKEND_URL 수정
+cp .env .env         # 필요하면 VITE_BACKEND_URL 수정
 npm run dev
 ```
 

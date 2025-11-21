@@ -1,10 +1,11 @@
 import React from 'react';
-import PlusIcon from '@/shared/components/icons/PlusIcon';
 import DiaryIcon from '@/shared/components/icons/DiaryIcon';
 import LogoutIcon from '@/shared/components/icons/LogoutIcon';
 import { User } from '@/shared/types';
 import ChevronLeftIcon from '@/shared/components/icons/ChevronLeftIcon';
 import ChevronRightIcon from '@/shared/components/icons/ChevronRightIcon';
+import TimemachineLogo from '@/shared/components/icons/TimemachineLogo';
+import SparklesIcon from '@/shared/components/icons/SparklesIcon';
 
 interface HomeScreenProps {
   user: User | null;
@@ -127,143 +128,233 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onStart, onDiary, onLogou
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center p-4 animate-fade-in w-full">
-      <div className="w-full max-w-4xl">
-        <div className="flex justify-between items-center w-full mb-8">
-            {user && (
+    <div className="min-h-screen text-slate-900 flex flex-col bg-gradient-to-br from-slate-50 via-white to-violet-50">
+      {/* Top bar */}
+      <nav className="w-full">
+        <div className="w-full px-0 py-3 grid grid-cols-3 items-center">
+          <div className="flex items-center gap-3">
+            {user ? (
               <div className="text-left">
-                  <p className="text-lg text-slate-500">환영합니다,</p>
-                  <p className="font-semibold text-xl text-slate-700">{displayName}님</p>
+                <p className="text-xs text-slate-500">반가워요,</p>
+                <p className="text-sm font-semibold text-slate-800">{displayName}</p>
               </div>
+            ) : (
+              <div className="hidden sm:block" aria-hidden="true" />
             )}
+          </div>
+
+          <div className="flex items-center justify-center gap-2 text-violet-700">
+            <div className="w-11 h-11 rounded-2xl bg-white/60 backdrop-blur border border-violet-200 flex items-center justify-center">
+              <TimemachineLogo className="w-8 h-8 text-violet-700" />
+            </div>
+            <div className="text-center">
+              <p className="text-xl md:text-2xl font-extrabold leading-tight tracking-tight text-slate-900">TIMEMACHINE AI</p>
+              <p className="text-[11px] md:text-xs uppercase tracking-[0.22em] text-slate-500 font-medium">Emotional Reframing Platform</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 justify-end">
             {isGuest ? (
-              <button
-                onClick={onLogin}
-                className="flex items-center gap-2 text-violet-700 hover:text-violet-800 transition-colors group font-semibold"
-                aria-label="로그인"
-              >
-                <span className="hidden sm:inline group-hover:underline">로그인</span>
-              </button>
+              <>
+                <button
+                  onClick={onLogin}
+                  className="hidden sm:inline text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-2"
+                >
+                  로그인
+                </button>
+                <button
+                  onClick={handleStartClick}
+                  className="text-sm font-semibold bg-violet-700 text-white px-4 py-2 rounded-xl hover:bg-violet-800 transition shadow-sm"
+                >
+                  무료로 시작
+                </button>
+              </>
             ) : (
               <button
-                  onClick={onLogout}
-                  className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors group"
-                  aria-label="로그아웃"
+                onClick={onLogout}
+                className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-violet-600 px-3 py-2 transition-colors"
+                aria-label="로그아웃"
               >
-                  <LogoutIcon className="w-6 h-6" />
-                  <span className="font-semibold hidden sm:inline group-hover:underline">로그아웃</span>
+                <LogoutIcon className="w-5 h-5" />
+                <span className="hidden sm:inline">로그아웃</span>
               </button>
             )}
-        </div>
-
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-800">
-            TIMEMACHINE AI
-          </h1>
-          <p className="mt-4 text-xl text-slate-600">
-            당신의 감정을 다시 경험하고, 당신의 이야기를 새로 써보세요.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div
-            onClick={handleStartClick}
-            className="group cursor-pointer bg-gradient-to-br from-violet-500 to-purple-600 text-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 flex flex-col items-center text-center"
-          >
-            <div className="bg-white/20 p-4 rounded-full mb-6">
-                <PlusIcon className="w-10 h-10" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">새로운 회고 시작하기</h2>
-            <p className="text-violet-100 max-w-xs">
-                과거의 특정 상황을 되돌아보고, AI와 함께 대화를 시뮬레이션하여 새로운 관점을 발견하세요.
-            </p>
-          </div>
-          <div
-            onClick={handleDiaryClick}
-            className="group cursor-pointer bg-white text-slate-700 p-8 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 flex flex-col items-center text-center"
-          >
-            <div className="bg-slate-100 group-hover:bg-violet-100 p-4 rounded-full mb-6 transition-colors">
-                <DiaryIcon className="w-10 h-10 text-slate-600 group-hover:text-violet-600 transition-colors" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">나의 회고 목록</h2>
-            <p className="text-slate-500 max-w-xs">
-                과거에 진행했던 모든 회고 기록과 AI가 생성한 인사이트 리포트를 확인하고 성장을 추적하세요.
-            </p>
           </div>
         </div>
+      </nav>
 
-        <div className="mt-16">
-            <div className="bg-white/70 backdrop-blur-sm p-8 rounded-2xl shadow-md border border-slate-200">
-                <h3 className="font-bold text-slate-700 mb-3 text-xl">TIMEMACHINE AI란?</h3>
-                <p className="text-base text-slate-600 max-w-2xl mx-auto">
-                    이곳은 당신의 감정을 탐색할 수 있는 안전한 공간입니다. 대화 시뮬레이션을 통해 명확성을 얻고, 소통을 연습하며, 자신의 감정적 반응을 더 잘 이해할 수 있습니다.
-                </p>
-                <div className="mt-8">
-                  <h4 className="text-2xl font-semibold text-violet-700 mb-6">사용 가이드</h4>
-                  
-                  <div className="relative">
-                    <div className="relative bg-violet-50 p-6 rounded-xl border border-violet-100">
-                      {/* Sizer element to dynamically set container height */}
+      {/* Hero */}
+      <main className="flex-1 w-full">
+        <div className="w-full px-0 py-6 grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+          <div className="text-left space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-bold tracking-wide uppercase">
+              TIMEMACHINE AI · 감정 리프레이밍
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-slate-900">
+              <br className="hidden md:block" /> 감정을 다시 써보는 대화형 타임머신
+            </h1>
+            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
+              과거 갈등을 재현하고 다른 선택을 실험하세요. 시뮬레이션 후 곧바로 감정 리포트를 받아 성찰까지 완성합니다.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleStartClick}
+                className="bg-violet-700 text-white font-semibold px-5 py-3 rounded-xl shadow hover:bg-violet-800 transition"
+              >
+                무료로 시작하기
+              </button>
+              <button
+                onClick={handleDiaryClick}
+                className="bg-white text-violet-700 border border-violet-200 font-semibold px-5 py-3 rounded-xl hover:bg-violet-50 transition"
+              >
+                회고 목록 보기
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-slate-700">
+              <div className="rounded-xl border border-violet-100 bg-white px-3 py-3 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                    <TimemachineLogo className="w-5 h-5 text-violet-700" />
+                  </div>
+                  <p className="font-bold text-base text-slate-900">정교한 재현</p>
+                </div>
+                <p className="text-slate-600">사건·감정·인물 정보를 반영한 시뮬레이션</p>
+              </div>
+              <div className="rounded-xl border border-violet-100 bg-white px-3 py-3 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                    <SparklesIcon className="w-5 h-5 text-violet-700" />
+                  </div>
+                  <p className="font-bold text-base text-slate-900">선택 실험</p>
+                </div>
+                <p className="text-slate-600">다른 선택지와 코칭을 즉시 확인</p>
+              </div>
+              <div className="rounded-xl border border-violet-100 bg-white px-3 py-3 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                    <DiaryIcon className="w-5 h-5 text-violet-700" />
+                  </div>
+                  <p className="font-bold text-base text-slate-900">표준 리포트</p>
+                </div>
+                <p className="text-slate-600">감정 흐름·패턴·행동 제안 자동 생성</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -top-12 -right-6 w-64 h-64 bg-violet-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+            <div className="absolute -bottom-14 -left-10 w-80 h-80 bg-indigo-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
+            <div className="relative bg-white/80 backdrop-blur-md border border-white/50 shadow-xl rounded-3xl p-8 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-800 font-bold">
+                  01
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">회고 생성</p>
+                  <p className="text-sm text-slate-600">사건·감정·상대 정보를 입력해 맥락을 준비합니다.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-800 font-bold">
+                  02
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">감정 시뮬레이션</p>
+                  <p className="text-sm text-slate-600">AI와 대화하며 다른 선택을 실험하고 코칭을 받습니다.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-800 font-bold">
+                  03
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">감정 리포트</p>
+                  <p className="text-sm text-slate-600">감정 흐름과 패턴, 행동 제안을 자동으로 받아봅니다.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-800 font-bold">
+                  04
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">기록 관리</p>
+                  <p className="text-sm text-slate-600">회고와 리포트를 저장하고 언제든 다시 열람합니다.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Guide */}
+        <div className="w-full px-0 pb-10">
+          <div className="bg-white/85 backdrop-blur p-8 rounded-3xl shadow-md border border-white/50">
+            <h3 className="font-bold text-slate-700 mb-3 text-xl">사용 가이드</h3>
+            <p className="text-base text-slate-600 max-w-2xl">
+              실제 화면을 보며 흐름을 빠르게 확인하세요. 모바일 1단, 데스크톱 2단 레이아웃으로 어디서나 동일한 경험을 제공합니다.
+            </p>
+            <div className="mt-8">
+              <div className="relative">
+                <div className="relative bg-violet-50 p-6 rounded-xl border border-violet-100">
+                  <GuideSlideContent
+                    step={guideSteps[currentStep]}
+                    isFirstStep={currentStep === 0}
+                    selectedImageIndex={selectedImageIndex}
+                    onThumbnailClick={setSelectedImageIndex}
+                    isInvisible={true}
+                  />
+
+                  {guideSteps.map((step, index) => (
+                    <div
+                      key={index}
+                      className={`transition-opacity duration-500 ease-in-out absolute top-0 left-0 w-full h-full p-6 flex flex-col items-start justify-center ${
+                        index === currentStep ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                      }`}
+                    >
                       <GuideSlideContent
-                        step={guideSteps[currentStep]}
-                        isFirstStep={currentStep === 0}
+                        step={step}
+                        isFirstStep={index === 0}
                         selectedImageIndex={selectedImageIndex}
                         onThumbnailClick={setSelectedImageIndex}
-                        isInvisible={true}
+                        isInvisible={false}
                       />
-
-                      {guideSteps.map((step, index) => (
-                        <div
-                          key={index}
-                          className={`transition-opacity duration-500 ease-in-out absolute top-0 left-0 w-full h-full p-6 flex flex-col items-start justify-center ${
-                            index === currentStep ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                          }`}
-                        >
-                          <GuideSlideContent
-                            step={step}
-                            isFirstStep={index === 0}
-                            selectedImageIndex={selectedImageIndex}
-                            onThumbnailClick={setSelectedImageIndex}
-                            isInvisible={false}
-                          />
-                        </div>
-                      ))}
                     </div>
-
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
-                      {guideSteps.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentStep(index)}
-                          className={`w-3 h-3 rounded-full transition-colors ${
-                            currentStep === index ? 'bg-violet-700' : 'bg-violet-200 hover:bg-violet-300'
-                          }`}
-                          aria-label={`Go to step ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={handlePrev}
-                      disabled={currentStep === 0}
-                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/50 hover:bg-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                      aria-label="Previous step"
-                    >
-                      <ChevronLeftIcon className="w-6 h-6 text-violet-700" />
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      disabled={currentStep === guideSteps.length - 1}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/50 hover:bg-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                      aria-label="Next step"
-                    >
-                      <ChevronRightIcon className="w-6 h-6 text-violet-700" />
-                    </button>
-                  </div>
+                  ))}
                 </div>
+
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+                  {guideSteps.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentStep(index)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        currentStep === index ? 'bg-violet-700' : 'bg-violet-200 hover:bg-violet-300'
+                      }`}
+                      aria-label={`Go to step ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={handlePrev}
+                  disabled={currentStep === 0}
+                  className="absolute top-1/2 left-2 -translate-y-1/2 bg-white border border-slate-200 hover:border-violet-200 rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  aria-label="Previous step"
+                >
+                  <ChevronLeftIcon className="w-6 h-6 text-violet-700" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={currentStep === guideSteps.length - 1}
+                  className="absolute top-1/2 right-2 -translate-y-1/2 bg-white border border-slate-200 hover:border-violet-200 rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  aria-label="Next step"
+                >
+                  <ChevronRightIcon className="w-6 h-6 text-violet-700" />
+                </button>
+              </div>
             </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
