@@ -1,9 +1,10 @@
-import { Reflection, Report, Message } from '../types';
+import { Reflection, Report, Message, Emotion } from '../types';
 import { getApiUrl, handleJsonResponse, requireAuthJsonHeaders } from './apiClient';
 
 const CHAT_ENDPOINT = getApiUrl('/api/reflections/chat');
 const REPORT_ENDPOINT = getApiUrl('/api/reflections/reports');
 const REPORT_LIST_ENDPOINT = REPORT_ENDPOINT;
+const DELETE_ENDPOINT = (id: string) => getApiUrl(`/api/reflections/${id}`);
 
 type ReportListItem = {
   report_id?: number;
@@ -14,6 +15,7 @@ type ReportListItem = {
   report_json?: string | null;
   created_at?: string | null;
   processed_at?: string | null;
+  emotions?: string[];
 };
 
 const formatConversationLines = (conversation: Message[]): string => {
@@ -57,6 +59,7 @@ export const generateReport = async (
   const payload = {
     sessionId: reflection.id,
     conversationContext: buildConversationContext(reflection, conversation),
+    emotions: reflection.emotions,
   };
 
   const headers = requireAuthJsonHeaders();
@@ -119,7 +122,7 @@ const historyItemToReflection = (item: ReportListItem): Reflection => {
     id: item.session_id || String(item.report_id ?? createdDate.getTime()),
     date: createdDateText,
     whatHappened: summaryFallback,
-    emotions: [],
+    emotions: (Array.isArray(item.emotions) ? item.emotions : []) as Emotion[],
     emotionIntensity: 0,
     whatYouDid: '',
     howYouWishItHadGone: '',
@@ -177,4 +180,16 @@ export const fetchReportHistory = async (): Promise<Reflection[]> => {
   }
 
   return data.map(historyItemToReflection);
+};
+
+export const deleteReflection = async (id: string): Promise<void> => {
+  const headers = requireAuthJsonHeaders();
+  const response = await fetch(DELETE_ENDPOINT(id), {
+    method: 'DELETE',
+    headers,
+  });
+
+  if (!response.ok) {
+    await handleJsonResponse(response);
+  }
 };

@@ -29,20 +29,20 @@ export default function App() {
 
   const renderContent = () => {
     if (!user) {
-        if (screen === Screen.Auth) {
-          return <AuthScreen onLogin={handleLogin} />;
-        }
-        return (
-          <HomeScreen
-            user={null}
-            onStart={() => goToAuth()}
-            onDiary={() => goToAuth()}
-            onLogout={() => goToAuth()}
-            onLogin={() => goToAuth()}
-          />
-        );
+      if (screen === Screen.Auth) {
+        return <AuthScreen onLogin={handleLogin} />;
+      }
+      return (
+        <HomeScreen
+          user={null}
+          onStart={() => goToAuth()}
+          onDiary={() => goToAuth()}
+          onLogout={() => goToAuth()}
+          onLogin={() => goToAuth()}
+        />
+      );
     }
-    
+
     switch (screen) {
       case Screen.Input:
         return <SituationInputScreen onStartSimulation={startSimulation} onBack={() => navigate(Screen.Home)} />;
@@ -54,15 +54,15 @@ export default function App() {
       case Screen.Report:
         const reflectionToView: Reflection | null = viewingReflection || currentReflection;
         if (reflectionToView) {
-            return <ReportScreen 
-                reflection={reflectionToView} 
-                onSave={viewingReflection ? undefined : saveToDiary}
-                onHome={() => viewingReflection ? navigate(Screen.Diary) : navigate(Screen.Home)}
-            />;
+          return <ReportScreen
+            reflection={reflectionToView}
+            onSave={viewingReflection ? undefined : saveToDiary}
+            onHome={() => viewingReflection ? navigate(Screen.Diary) : navigate(Screen.Home)}
+          />;
         }
         return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} onLogin={() => goToAuth()} />;
       case Screen.Diary:
-        return <DiaryScreen diary={diary} onViewReport={viewReport} onNewReflection={startNewReflection} onLogout={handleLogout} />;
+        return <DiaryScreen diary={diary} onViewReport={viewReport} onNewReflection={startNewReflection} onLogout={handleLogout} onDelete={actions.deleteReflection} />;
       case Screen.Home:
       default:
         return <HomeScreen user={user} onStart={startNewReflection} onDiary={() => navigate(Screen.Diary)} onLogout={handleLogout} onLogin={() => goToAuth()} />;
@@ -91,10 +91,10 @@ export default function App() {
   })();
 
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 flex items-center justify-center">
-      <div className="container mx-auto max-w-5xl p-4 w-full relative pt-12">
+    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 flex items-center justify-center selection:bg-primary-100 selection:text-primary-900">
+      <div className="container mx-auto max-w-5xl p-4 w-full relative pt-12 md:pt-16 animate-fade-in">
         {backAction && (
-          <div className="absolute left-4 top-4">
+          <div className="absolute left-4 top-4 md:left-8 md:top-8 z-10">
             <BackButton onClick={backAction} />
           </div>
         )}

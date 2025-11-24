@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Message, Reflection, Screen, Situation, User } from '@/shared/types';
-import { fetchReportHistory, generateReport } from '@/shared/services/geminiService';
+import { fetchReportHistory, generateReport, deleteReflection as deleteReflectionApi } from '@/shared/services/geminiService';
 import { clearCurrentUser, loadCurrentUser, saveCurrentUser } from '@/shared/services/storageService';
 
 interface AppActions {
@@ -16,6 +16,7 @@ interface AppActions {
   backFromSimulation: () => void;
   backFromViewingReport: () => void;
   backFromReportToHome: () => void;
+  deleteReflection: (id: string) => Promise<void>;
 }
 
 export const useReflectionApp = () => {
@@ -193,6 +194,23 @@ export const useReflectionApp = () => {
     }));
   }, []);
 
+  const deleteReflection = useCallback(async (id: string) => {
+    try {
+      await deleteReflectionApi(id);
+      setState(prev => ({
+        ...prev,
+        diary: prev.diary.filter(item => item.id !== id),
+      }));
+    } catch (error) {
+      console.error('Failed to delete reflection:', error);
+      // Optimistically delete from local state even if server fails?
+      // Or show error? For now, let's assume if it fails, we don't update UI to keep sync.
+      // But to be user friendly, maybe we should just update local state if it's a 404 or similar.
+      // Let's stick to simple error logging for now.
+      alert('회고 삭제에 실패했습니다.');
+    }
+  }, []);
+
   const actions: AppActions = {
     navigate,
     goToAuth,
@@ -206,6 +224,7 @@ export const useReflectionApp = () => {
     backFromSimulation,
     backFromViewingReport,
     backFromReportToHome,
+    deleteReflection,
   };
 
   return { state, actions };
