@@ -28,13 +28,25 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ reflection, onSave, onHome 
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary-100/50 rounded-full blur-2xl -ml-8 -mb-8 animate-pulse pointer-events-none" style={{ animationDelay: '1s' }} />
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-white rounded-2xl flex items-center justify-center shadow-sm mb-6 border border-primary-100/50">
-              <SparklesIcon className="w-10 h-10 text-primary-500 animate-pulse" />
+            <div className="w-24 h-24 relative mb-8">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full animate-ping opacity-20" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-white rounded-full flex items-center justify-center shadow-sm border border-primary-100/50 z-10">
+                <span className="text-4xl animate-bounce">🤔</span>
+              </div>
+              <div className="absolute -top-2 -right-2 text-2xl animate-bounce" style={{ animationDelay: '0.2s' }}>💭</div>
+              <div className="absolute -bottom-2 -left-2 text-2xl animate-bounce" style={{ animationDelay: '0.5s' }}>💡</div>
+              <div className="absolute top-1/2 -right-6 text-xl animate-pulse">✨</div>
             </div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-3">리포트 생성 중...</h2>
+
+            <h2 className="text-2xl font-bold text-slate-800 mb-3">감정을 분석하고 있어요...</h2>
+            <div className="flex gap-2 justify-center mb-4">
+              <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"></span>
+            </div>
             <p className="text-slate-600 leading-relaxed">
-              AI가 대화 내용을 깊이 있게 분석하고<br />
-              당신을 위한 통찰을 정리하고 있습니다.
+              대화 속에 숨겨진 의미를 찾고<br />
+              더 나은 대화 방향을 고민하고 있습니다.
             </p>
           </div>
         </div>
@@ -86,6 +98,22 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ reflection, onSave, onHome 
             ) : (
               <p className="text-slate-400 italic">요약이 준비되는 중입니다.</p>
             )}
+          </div>
+        </section>
+
+        <section className="bg-gradient-to-br from-sky-50 to-white border border-sky-100 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.75 3c1.995 0 3.529.982 4.25 2.561C12.72 4.005 14.254 3 16.25 3c3.036 0 5.5 2.322 5.5 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.47 0l-.003-.001z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-sky-800">심리상담사의 조언</h3>
+          </div>
+          <div className="bg-white border border-sky-100/50 p-6 rounded-2xl shadow-sm">
+            <p className="text-sky-700 leading-relaxed text-lg font-medium">
+              여기에 심리상담사 조언이 들어갑니다.
+            </p>
           </div>
         </section>
 

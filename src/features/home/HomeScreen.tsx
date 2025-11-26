@@ -51,19 +51,18 @@ const guideSteps = [
 const GuideSlideContent = ({ step, isFirstStep, selectedImageIndex, onThumbnailClick, isInvisible }) => {
   const content = isFirstStep ? (
     <>
-      <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3] group">
+      <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[16/9] group bg-slate-200">
         <img
           src={step.images[selectedImageIndex]}
           alt={step.alt}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300" />
       </div>
       <div className="grid grid-cols-5 gap-3 w-full mt-4">
         {step.images.map((imgSrc, imgIndex) => (
           <div
             key={imgIndex}
-            className={`relative rounded-lg overflow-hidden cursor-pointer aspect-[4/3] transition-all duration-300 ${selectedImageIndex === imgIndex
+            className={`relative rounded-lg overflow-hidden cursor-pointer aspect-[4/3] bg-slate-200 transition-all duration-300 ${selectedImageIndex === imgIndex
               ? 'ring-2 ring-primary-500 ring-offset-2 scale-105 shadow-md'
               : 'opacity-70 hover:opacity-100 hover:scale-105'
               }`}
@@ -84,11 +83,11 @@ const GuideSlideContent = ({ step, isFirstStep, selectedImageIndex, onThumbnailC
     </>
   ) : (
     <>
-      <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3] group">
+      <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[16/9] group bg-slate-200">
         <img
           src={step.image}
           alt={step.alt}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="text-left w-full mt-6 space-y-2">

@@ -47,6 +47,12 @@ export const requireAuthJsonHeaders = () => {
 };
 
 export const handleJsonResponse = async (response: Response) => {
+  if (response.status === 401) {
+    localStorage.removeItem(CURRENT_USER_KEY);
+    window.location.reload();
+    throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+  }
+
   if (!response.ok) {
     const data = await safeJson(response);
     const detail =
