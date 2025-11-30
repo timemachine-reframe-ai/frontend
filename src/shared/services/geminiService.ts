@@ -1,8 +1,12 @@
-import { Reflection, Report, Message, Emotion } from '../types';
-import { getApiUrl, handleJsonResponse, requireAuthJsonHeaders } from './apiClient';
+import { Reflection, Report, Message, Emotion } from "../types";
+import {
+  getApiUrl,
+  handleJsonResponse,
+  requireAuthJsonHeaders,
+} from "./apiClient";
 
-const CHAT_ENDPOINT = getApiUrl('/api/reflections/chat');
-const REPORT_ENDPOINT = getApiUrl('/api/reflections/reports');
+const CHAT_ENDPOINT = getApiUrl("/api/reflections/chat");
+const REPORT_ENDPOINT = getApiUrl("/api/reflections/reports");
 const REPORT_LIST_ENDPOINT = REPORT_ENDPOINT;
 const DELETE_ENDPOINT = (id: string) => getApiUrl(`/api/reflections/${id}`);
 
@@ -19,25 +23,28 @@ type ReportListItem = {
 };
 
 const formatConversationLines = (conversation: Message[]): string => {
-  if (!conversation.length) return '';
+  if (!conversation.length) return "";
   return conversation
-    .map(msg => `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}`)
-    .join('\n');
+    .map((msg) => `${msg.sender === "user" ? "User" : "AI"}: ${msg.text}`)
+    .join("\n");
 };
 
-const buildConversationContext = (reflection: Reflection, conversation: Message[]): string => {
+const buildConversationContext = (
+  reflection: Reflection,
+  conversation: Message[]
+): string => {
   const sections = [
     `What Happened: ${reflection.whatHappened}`,
-    `Emotions: ${reflection.emotions.join(', ')}`,
+    `Emotions: ${reflection.emotions.join(", ")}`,
     `What You Did: ${reflection.whatYouDid}`,
     `Desired Outcome: ${reflection.howYouWishItHadGone}`,
   ];
   const conversationText = formatConversationLines(conversation);
   if (conversationText) {
-    sections.push('Conversation:');
+    sections.push("Conversation:");
     sections.push(conversationText);
   }
-  return sections.join('\n');
+  return sections.join("\n");
 };
 
 type ReportGenerationResponse = {
@@ -49,57 +56,83 @@ type ReportGenerationResponse = {
     summary?: string;
     keyInsights?: string[];
     suggestedPhrases?: string[];
+    counselorAdvice?: string;
+    psychologicalNote?: string;
+    encouragement?: string;
   } | null;
 };
 
 export const generateReport = async (
   reflection: Reflection,
   conversation: Message[],
+  userName?: string
 ): Promise<Report> => {
   const payload = {
     sessionId: reflection.id,
     conversationContext: buildConversationContext(reflection, conversation),
     emotions: reflection.emotions,
+    userName: userName || "사용자",
   };
 
   const headers = requireAuthJsonHeaders();
 
   const response = await fetch(REPORT_ENDPOINT, {
-    method: 'POST',
+    method: "POST",
     headers,
     body: JSON.stringify(payload),
   });
 
   const data: ReportGenerationResponse = await handleJsonResponse(response);
-  if (data.status !== 'finished' || !data.report_json) {
-    const reason = data.failure_reason ?? '보고서를 생성하지 못했습니다.';
+  if (data.status !== "finished" || !data.report_json) {
+    const reason = data.failure_reason ?? "보고서를 생성하지 못했습니다.";
     throw new Error(reason);
   }
   const reportJson = data.report_json ?? {};
   return {
-    summary: reportJson.summary ?? '',
+    summary: reportJson.summary ?? "",
     keyInsights: reportJson.keyInsights ?? [],
     suggestedPhrases: reportJson.suggestedPhrases ?? [],
+    counselorAdvice: reportJson.counselorAdvice,
+    psychologicalNote: reportJson.psychologicalNote,
+    encouragement: reportJson.encouragement,
   };
 };
 
 const parseReportJson = (raw: unknown): Report => {
-  if (!raw) return { summary: '', keyInsights: [], suggestedPhrases: [] };
+  if (!raw) return { summary: "", keyInsights: [], suggestedPhrases: [] };
 
   try {
     const parsed =
-      typeof raw === 'string' ? (JSON.parse(raw) as Record<string, unknown>) : (raw as Record<string, unknown>);
+      typeof raw === "string"
+        ? (JSON.parse(raw) as Record<string, unknown>)
+        : (raw as Record<string, unknown>);
     return {
-      summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+      summary: typeof parsed.summary === "string" ? parsed.summary : "",
       keyInsights: Array.isArray(parsed.keyInsights)
-        ? (parsed.keyInsights.filter(item => typeof item === 'string') as string[])
+        ? (parsed.keyInsights.filter(
+            (item) => typeof item === "string"
+          ) as string[])
         : [],
       suggestedPhrases: Array.isArray(parsed.suggestedPhrases)
-        ? (parsed.suggestedPhrases.filter(item => typeof item === 'string') as string[])
+        ? (parsed.suggestedPhrases.filter(
+            (item) => typeof item === "string"
+          ) as string[])
         : [],
+      counselorAdvice:
+        typeof parsed.counselorAdvice === "string"
+          ? parsed.counselorAdvice
+          : undefined,
+      psychologicalNote:
+        typeof parsed.psychologicalNote === "string"
+          ? parsed.psychologicalNote
+          : undefined,
+      encouragement:
+        typeof parsed.encouragement === "string"
+          ? parsed.encouragement
+          : undefined,
     };
   } catch {
-    return { summary: '', keyInsights: [], suggestedPhrases: [] };
+    return { summary: "", keyInsights: [], suggestedPhrases: [] };
   }
 };
 
@@ -107,15 +140,15 @@ const historyItemToReflection = (item: ReportListItem): Reflection => {
   const baseReport = parseReportJson(item.report_json);
   const summaryFallback =
     baseReport.summary ||
-    (typeof item.report_md === 'string' && item.report_md.trim().length > 0
+    (typeof item.report_md === "string" && item.report_md.trim().length > 0
       ? item.report_md
-      : '요약이 없습니다.');
+      : "요약이 없습니다.");
 
   const createdDate = item.created_at ? new Date(item.created_at) : new Date();
-  const createdDateText = createdDate.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const createdDateText = createdDate.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return {
@@ -124,16 +157,19 @@ const historyItemToReflection = (item: ReportListItem): Reflection => {
     whatHappened: summaryFallback,
     emotions: (Array.isArray(item.emotions) ? item.emotions : []) as Emotion[],
     emotionIntensity: 0,
-    whatYouDid: '',
-    howYouWishItHadGone: '',
-    personaName: '',
-    personaTone: '',
-    personaPersonality: '',
+    whatYouDid: "",
+    howYouWishItHadGone: "",
+    personaName: "",
+    personaTone: "",
+    personaPersonality: "",
     conversation: [],
     report: {
       summary: summaryFallback,
       keyInsights: baseReport.keyInsights ?? [],
       suggestedPhrases: baseReport.suggestedPhrases ?? [],
+      counselorAdvice: baseReport.counselorAdvice,
+      psychologicalNote: baseReport.psychologicalNote,
+      encouragement: baseReport.encouragement,
     },
   };
 };
@@ -141,7 +177,7 @@ const historyItemToReflection = (item: ReportListItem): Reflection => {
 export const requestChatReply = async (
   reflection: Reflection,
   conversation: Message[],
-  userMessage: string,
+  userMessage: string
 ): Promise<string> => {
   const payload = {
     whatHappened: reflection.whatHappened,
@@ -158,19 +194,19 @@ export const requestChatReply = async (
   const headers = requireAuthJsonHeaders();
 
   const response = await fetch(CHAT_ENDPOINT, {
-    method: 'POST',
+    method: "POST",
     headers,
     body: JSON.stringify(payload),
   });
 
   const data = await handleJsonResponse(response);
-  return data.reply ?? '';
+  return data.reply ?? "";
 };
 
 export const fetchReportHistory = async (): Promise<Reflection[]> => {
   const headers = requireAuthJsonHeaders();
   const response = await fetch(REPORT_LIST_ENDPOINT, {
-    method: 'GET',
+    method: "GET",
     headers,
   });
 
@@ -185,7 +221,7 @@ export const fetchReportHistory = async (): Promise<Reflection[]> => {
 export const deleteReflection = async (id: string): Promise<void> => {
   const headers = requireAuthJsonHeaders();
   const response = await fetch(DELETE_ENDPOINT(id), {
-    method: 'DELETE',
+    method: "DELETE",
     headers,
   });
 

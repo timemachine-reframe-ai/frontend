@@ -122,17 +122,19 @@ export const useReflectionApp = () => {
   const endSimulation = useCallback(
     async (conversation: Message[]) => {
       let reflectionSnapshot: Reflection | null = null;
+      let userName: string | undefined;
       setState(prev => {
         if (!prev.currentReflection) return prev;
         const updatedReflection = { ...prev.currentReflection, conversation };
         reflectionSnapshot = updatedReflection;
+        userName = prev.user?.name || prev.user?.username;
         return { ...prev, currentReflection: updatedReflection, screen: Screen.Report };
       });
 
       if (!reflectionSnapshot) return;
 
       try {
-        const report = await generateReport(reflectionSnapshot, conversation);
+        const report = await generateReport(reflectionSnapshot, conversation, userName);
         setState(prev =>
           prev.currentReflection
             ? { ...prev, currentReflection: { ...prev.currentReflection, report } }
