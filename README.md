@@ -1,104 +1,184 @@
-# TIMEMACHINE AI – 프론트엔드
+# 🕰️ TIMEMACHINE AI – 프론트엔드
 
-이 폴더는 사용자가 회고 내용을 입력하고, AI와 대화를 나누며, 리포트를 확인할 수 있는 React 앱입니다. 브라우저는 FastAPI 백엔드만 호출하고, Gemini 키는 서버 쪽에서만 사용하므로 프런트에는 노출되지 않습니다.
+과거의 아쉬운 대화를 다시 경험하고, **13,234개의 상담 데이터**를 바탕으로 전문 심리상담사 같은 조언을 받는 React 앱입니다.
 
 ---
 
-## 1. 가장 빠르게 실행하기
-
-1. [Node.js 20+](https://nodejs.org/ko) 를 설치합니다.
-2. 프로젝트 루트에서 `frontend` 폴더로 이동합니다.
-3. 아래 순서를 그대로 입력하세요.
+## 🚀 빠른 시작
 
 ```bash
 cd frontend
 npm install
-cp .env .env         # 필요하면 VITE_BACKEND_URL 수정
 npm run dev
 ```
 
-- 브라우저에서 <http://localhost:3000> 을 열면 앱이 보입니다.
-- 백엔드 주소가 바뀌면 `.env` 의 `VITE_BACKEND_URL` 만 바꿔 주면 됩니다.
-- 배포 혹은 테스트 빌드가 필요하면 `npm run build` → `npm run preview` 순서로 확인하세요.
+브라우저에서 http://localhost:3000 접속
 
 ---
 
-## 2. 자주 쓰는 npm 스크립트
-
-| 명령 | 설명 |
-| --- | --- |
-| `npm run dev` | 개발 서버 실행 (파일 저장 시 자동 새로고침) |
-| `npm run build` | 프로덕션 번들 생성 (`dist/`) |
-| `npm run preview` | 빌드 결과를 로컬에서 확인 |
-
----
-
-## 3. 폴더 구조를 간단히 이해하기
+## 📁 프로젝트 구조
 
 ```
 src/
-├── app/
-│   └── App.tsx               → 전역 상태 훅을 호출해 라우팅/화면 전환 처리
 ├── features/
-│   ├── auth/                 → AuthScreen.tsx
-│   ├── home/                 → HomeScreen.tsx + 가이드 슬라이드
-│   ├── input/                → SituationInputScreen.tsx (5단계 폼)
-│   ├── simulation/           → SimulationScreen.tsx (채팅 UI)
-│   ├── report/               → ReportScreen.tsx
-│   ├── diary/                → DiaryScreen.tsx
+│   ├── auth/          → 로그인/회원가입
+│   ├── home/          → 홈 화면 + 가이드
+│   ├── input/         → 📝 상황 입력 (5단계)
+│   ├── simulation/    → 💬 AI 채팅
+│   ├── report/        → 📊 리포트 화면
+│   ├── diary/         → 📔 일기장
 │   └── reflection/
-│       └── hooks/useReflectionApp.ts → 전역 AppState와 액션(로그인/시뮬레이션 등) 정의
+│       └── hooks/useReflectionApp.ts  → 전역 상태 관리
+│
 ├── shared/
-│   ├── components/           → 공통 BackButton, 아이콘 SVG 등
 │   ├── services/
-│   │   ├── apiClient.ts      → API base URL/헤더/JWT 처리
-│   │   ├── authService.ts    → 로그인/회원가입/프로필 호출
-│   │   ├── geminiService.ts  → 채팅/리포트 fetch 함수 집합
-│   │   └── storageService.ts → LocalStorage 접근 유틸
-│   └── types.ts              → Screen, Reflection 등 공통 타입
-├── assets/                   → 이미지/아이콘 리소스
-└── main.tsx                  → ReactDOM.createRoot 진입점
+│   │   ├── geminiService.ts   → 채팅/리포트 API
+│   │   └── authService.ts     → 인증 API
+│   └── types.ts               → 타입 정의
+│
+└── assets/            → 이미지/아이콘
 ```
 
-핵심은 `features` 폴더 하나만 보면 “어떤 화면이 있는지” 바로 파악된다는 점입니다. 전역 상태는 `useReflectionApp` 훅 한 곳에서 관리하고, 각 화면은 필요한 액션만 props로 받아 사용합니다.
+---
+
+## 🔄 앱 흐름
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  📝 입력     │ →   │  💬 시뮬레이션 │ →   │  📊 리포트   │ →   │  📔 저장     │
+│  (5단계)     │     │  (AI 채팅)    │     │  (분석)      │     │  (일기장)    │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+```
+
+### 5단계 입력
+
+1. **무슨 일이 있었나요?** → `whatHappened`
+2. **어떤 감정을 느꼈나요?** → `emotions` + `emotionIntensity`
+3. **무엇을 했거나 못했나요?** → `whatYouDid`
+4. **어떻게 되길 바랐나요?** → `howYouWishItHadGone`
+5. **상대방 정보** → `personaName`, `personaTone`, `personaPersonality`
 
 ---
 
-## 4. 어떤 화면이 있나요?
+## 📦 핵심 타입
 
-- **Auth** – `/api/login`으로 로그인, `/api/users`로 회원가입, 로그인 후 `/api/me`로 프로필을 최신화합니다. 발급된 access token은 LocalStorage에 저장합니다.
-- **Home** – “새 회고 시작” / “나의 회고 목록” / 사용 가이드를 보여 줍니다.
-- **Input** – 5단계 폼에서 상황, 감정, 행동, 원하는 결과, persona 정보를 모읍니다.
-- **Simulation** – `/api/reflections/chat`으로 AI와 대화를 시뮬레이션합니다. 턴을 모두 쓰면 연장 팝업이 뜹니다.
-- **Report** – `/api/reflections/reports` POST로 리포트를 생성해 보여줍니다.
-- **Diary** – `/api/reflections/reports` GET으로 저장된 회고/리포트를 불러옵니다. (현재 감정 필터 없이 리스트만 제공합니다.)
+```typescript
+interface Reflection {
+  id: string;
+  whatHappened: string; // 상황
+  emotions: Emotion[]; // 감정
+  whatYouDid: string; // 행동
+  howYouWishItHadGone: string; // 바랐던 결과
+  personaName: string; // 상대방 이름
+  personaTone: string; // 말투
+  personaPersonality: string; // 성격
+  conversation: Message[]; // 대화 기록
+  report: Report | null; // 리포트
+}
 
----
-
-## 5. 백엔드와 어떻게 통신하나요?
-
-- 모든 통신은 `shared/services`의 fetch 유틸로 이뤄집니다.
-  - `apiClient.ts` – 기본 URL, JSON 헤더, JWT Authorization 헤더를 구성합니다.
-  - `authService.ts` – `/api/login`, `/api/users`, `/api/me`, `/api/login-id/check` 호출.
-  - `geminiService.ts` – `/api/reflections/chat`, `/api/reflections/reports` (POST 생성, GET 목록) 호출.
-- 사용자/토큰은 LocalStorage에서 관리합니다 (`shared/services/storageService.ts`). 전역 상태 훅 `useReflectionApp`이 로그인 시 저장하고, 앱 시작 시 불러옵니다.
-
----
-
-## 6. 새 팀원을 위해: 개발 흐름 요약
-
-1. `npm run dev` 로 브라우저에서 앱을 띄웁니다.
-2. `features` 폴더에서 만들고 싶은 화면(혹은 기능)을 찾습니다.
-3. 필요한 전역 상태나 액션은 `useReflectionApp` 훅에 추가합니다.
-4. 백엔드 호출이 필요하면 `shared/services/geminiService.ts` 에 fetch 함수를 정의한 뒤 사용하는 화면에 주입합니다.
-5. 공통 UI가 필요하면 `shared/components` 에 작은 컴포넌트를 만들고 재사용합니다.
-
-이 흐름만 익히면 누구나 손쉽게 기능을 추가할 수 있습니다.
+interface Report {
+  summary: string;
+  keyInsights: string[];
+  suggestedPhrases: string[];
+  counselorAdvice?: string; // 💙 심리상담사 조언 (RAG 기반)
+  psychologicalNote?: string; // 심리학적 분석
+  encouragement?: string; // 격려 메시지
+}
+```
 
 ---
 
-## 7. 도움말
+## 🎬 시연 시나리오 (최적화된 예시)
 
-- 백엔드만 실행되어 있다면, 이 프런트는 명령어 몇 개로 바로 올릴 수 있습니다.
-- TypeScript를 두려워하지 마세요. `shared/types.ts` 에 정의된 타입을 참고하면 컴파일러가 대부분의 실수를 잡아줍니다.
-- 추가로 궁금한 점이 있다면 README 최상단을 다시 읽어 보거나, `features/reflection/hooks/useReflectionApp.ts` 를 열어 앱 전체 흐름을 확인해 보세요.
+RAG 데이터 분포 기반 최적 시나리오 (직장/취업 56%, 두려움 76%)
+
+### 📝 입력 정보
+
+**Step 1 - 상황:**
+
+```
+오늘 팀 회의에서 내가 준비한 기획안을 발표했는데,
+팀장님이 다른 팀원들 앞에서 "이게 기획이야? 대학생 과제 수준이네"라고 말씀하셨어요.
+너무 창피하고 억울했는데 아무 말도 못하고 그냥 "수정하겠습니다"라고만 했어요.
+```
+
+**Step 2 - 감정:** 억울함, 분노, 두려움 (강도 8/10)
+
+**Step 3 - 행동:**
+
+```
+아무 반박도 못하고 그냥 수정하겠다고만 했어요.
+분명히 나름대로 열심히 준비했고 논리적인 근거도 있었는데,
+그 자리에서는 머리가 하얘져서 아무 말도 못했어요.
+```
+
+**Step 4 - 바랐던 결과:**
+
+```
+내 기획안의 의도와 근거를 차분하게 설명하고,
+어떤 부분이 부족한지 구체적인 피드백을 요청했으면 좋겠어요.
+상처받지 않으면서도 프로페셔널하게 대응하고 싶었어요.
+```
+
+**Step 5 - 상대방:**
+
+- 이름: `김팀장님`
+- 말투: `직설적이고 권위적`
+- 성격: `결과 중심적이고 까다롭지만, 일 잘하는 사람은 인정해주는 편`
+
+### 💬 대화 예시 (10턴)
+
+| Turn | 나                                                                   | 김팀장님                                               |
+| ---- | -------------------------------------------------------------------- | ------------------------------------------------------ |
+| 1    | "팀장님, 아까 회의 때 말씀하신 부분에 대해 조금 더 여쭤봐도 될까요?" | "응, 뭔데? 기획안 수정할 거 있어?"                     |
+| 2    | "어떤 부분이 구체적으로 부족했는지 알고 싶어서요."                   | "핵심이 안 보여. 그래서 뭘 해야 한다는 건지가 없잖아." |
+| 3    | "결론 부분이 약했다는 말씀이시군요."                                 | "기획안은 제안서야. 네 건 보고서에 가까웠어."          |
+| 4    | "솔직히 '대학생 과제 수준'이라고 하셨을 때 좀 당황스러웠어요."       | "...그랬나? 내가 좀 세게 말했나."                      |
+| 5    | "이런 피드백은 따로 말씀해주시면 더 잘 받아들일 수 있을 것 같아요."  | "그래, 내가 생각이 짧았네."                            |
+| 6    | "저도 앞으로는 핵심을 더 명확하게 정리해서 가져올게요."              | "네가 열심히 한 건 알아. 기획자는 세일즈맨이기도 해."  |
+| 7    | "참고하면 좋을 만한 기획안 예시가 있을까요?"                         | "작년 마케팅팀 리브랜딩 기획안 한번 봐."               |
+| 8    | "수정안 초안 나오면 먼저 검토 요청드려도 될까요?"                    | "그래, 목요일까지 초안 가져와봐."                      |
+| 9    | "오늘 따로 시간 내주셔서 감사합니다."                                | "아까 말투는 다음부터 조심할게."                       |
+| 10   | "네, 열심히 해볼게요!"                                               | "(살짝 미소) 그래, 수고해."                            |
+
+### 🎯 이 시나리오의 장점
+
+- **RAG 최적화**: 직장 갈등 + 두려움/억울함 → 유사 사례 다수
+- **자연스러운 전개**: 감정 표현 → 피드백 요청 → 상호 이해
+- **리포트 품질**: 권위적 관계에서의 자기표현, I-message 활용
+
+### 🎥 시연 팁
+
+1. 입력 단계: 천천히, 감정이 담긴 것처럼 타이핑
+2. 채팅 중: 1~2초 정도 생각하는 듯한 텀 두기
+3. 리포트: 스크롤하면서 "심리상담사의 조언" 섹션 강조
+
+---
+
+## 🛠️ npm 스크립트
+
+| 명령              | 설명                              |
+| ----------------- | --------------------------------- |
+| `npm run dev`     | 개발 서버 (http://localhost:3000) |
+| `npm run build`   | 프로덕션 빌드                     |
+| `npm run preview` | 빌드 결과 미리보기                |
+
+---
+
+## 🔧 환경 변수
+
+```bash
+# .env
+VITE_BACKEND_URL=http://localhost:8000
+```
+
+---
+
+## 🆕 최근 업데이트 (2025.11.30)
+
+| 기능                 | 설명                                          |
+| -------------------- | --------------------------------------------- |
+| **심리상담사 조언**  | 리포트에 RAG 기반 전문 상담사 조언 표시       |
+| **사용자 이름 호칭** | 회원가입 시 입력한 이름으로 조언에서 호칭     |
+| **마크다운 제거**    | 핵심 인사이트에서 `**텍스트**` 형식 자동 제거 |
+| **격려 메시지**      | 리포트 하단에 따뜻한 격려 메시지 표시         |
