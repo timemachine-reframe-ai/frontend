@@ -54,6 +54,7 @@ export interface Report {
   summary: string;
   keyInsights: string[];
   suggestedPhrases: string[];
+  counselorAdvice: string[];
 }
 
 export interface Reflection extends Situation {

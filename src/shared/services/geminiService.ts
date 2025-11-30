@@ -49,6 +49,7 @@ type ReportGenerationResponse = {
     summary?: string;
     keyInsights?: string[];
     suggestedPhrases?: string[];
+    counselorAdvice?: string[];
   } | null;
 };
 
@@ -80,11 +81,12 @@ export const generateReport = async (
     summary: reportJson.summary ?? '',
     keyInsights: reportJson.keyInsights ?? [],
     suggestedPhrases: reportJson.suggestedPhrases ?? [],
+    counselorAdvice: reportJson.counselorAdvice ?? [],
   };
 };
 
 const parseReportJson = (raw: unknown): Report => {
-  if (!raw) return { summary: '', keyInsights: [], suggestedPhrases: [] };
+  if (!raw) return { summary: '', keyInsights: [], suggestedPhrases: [], counselorAdvice: [] };
 
   try {
     const parsed =
@@ -97,9 +99,12 @@ const parseReportJson = (raw: unknown): Report => {
       suggestedPhrases: Array.isArray(parsed.suggestedPhrases)
         ? (parsed.suggestedPhrases.filter(item => typeof item === 'string') as string[])
         : [],
+      counselorAdvice: Array.isArray(parsed.counselorAdvice)
+        ? (parsed.counselorAdvice.filter(item => typeof item === 'string') as string[])
+        : [],
     };
   } catch {
-    return { summary: '', keyInsights: [], suggestedPhrases: [] };
+    return { summary: '', keyInsights: [], suggestedPhrases: [], counselorAdvice: [] };
   }
 };
 
@@ -134,6 +139,7 @@ const historyItemToReflection = (item: ReportListItem): Reflection => {
       summary: summaryFallback,
       keyInsights: baseReport.keyInsights ?? [],
       suggestedPhrases: baseReport.suggestedPhrases ?? [],
+      counselorAdvice: baseReport.counselorAdvice ?? [],
     },
   };
 };

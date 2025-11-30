@@ -111,9 +111,17 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ reflection, onSave, onHome 
             <h3 className="text-xl font-bold text-sky-800">심리상담사의 조언</h3>
           </div>
           <div className="bg-white border border-sky-100/50 p-6 rounded-2xl shadow-sm">
-            <p className="text-sky-700 leading-relaxed text-lg font-medium">
-              여기에 심리상담사 조언이 들어갑니다.
-            </p>
+            {report.counselorAdvice && report.counselorAdvice.length ? (
+              <ul className="space-y-4">
+                {report.counselorAdvice.map((advice, index) => (
+                  <li key={index} className="text-sky-700 leading-relaxed text-lg font-medium whitespace-pre-line">
+                    {advice}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-400 italic">참고할 상담사 조언을 모으는 중입니다.</p>
+            )}
           </div>
         </section>
 
