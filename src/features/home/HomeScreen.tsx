@@ -18,11 +18,11 @@ interface HomeScreenProps {
 const guideSteps = [
   {
     images: [
-      "src/assets/images/guide-input1.png",
-      "src/assets/images/guide-input2.png",
-      "src/assets/images/guide-input3.png",
-      "src/assets/images/guide-input4.png",
-      "src/assets/images/guide-input5.png",
+      "images/guide-input1.png",
+      "images/guide-input2.png",
+      "images/guide-input3.png",
+      "images/guide-input4.png",
+      "images/guide-input5.png",
     ],
     alt: "상황 입력 예시",
     title: "1. 상황 입력",
