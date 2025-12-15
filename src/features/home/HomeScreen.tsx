@@ -29,19 +29,19 @@ const guideSteps = [
     description: "최근에 있었던 문제 상황과 그 때 당신이 느낀 감정, 상대방의 정보등을 간단히 입력하세요. AI가 맥락을 이해하고 대화를 준비합니다.",
   },
   {
-    image: "src/assets/images/guide-simulation.png",
+    image: "images/guide-simulation.png",
     alt: "AI 대화 예시",
     title: "2. 대화 시뮬레이션",
     description: "그때 상황으로 다시 돌아가 AI를 상대로 대화를 시뮬레이션 합니다. 이번에는 원하던 결과를 얻을 수 있도록 더 나은 소통을 해 봅시다.",
   },
   {
-    image: "src/assets/images/guide-report.png",
+    image: "images/guide-report.png",
     alt: "리포트 생성 예시",
     title: "3. 리포트 생성",
     description: "대화가 끝나면 AI가 당신의 감정 흐름과 통찰을 분석해 리포트를 제공합니다. 성장의 포인트를 확인하세요.",
   },
   {
-    image: "src/assets/images/guide-list.png",
+    image: "images/guide-list.png",
     alt: "회고 목록 예시",
     title: "4. 회고 목록에서 다시 보기",
     description: "저장된 회고 기록을 언제든 다시 열람하며 자신의 변화와 성장 과정을 추적할 수 있습니다.",
